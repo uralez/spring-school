@@ -2,29 +2,41 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title th:text="#{app.title}">Spring School</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1 th:text="#{timetable.title}">Timetable</h1>
-<table border="1" cellpadding="6">
-  <thead>
-  <tr>
-    <th th:text="#{timetable.time}">Time</th>
-    <th th:each="d : ${#numbers.sequence(1,5)}" th:text="#{${'day.' + d}}">Day</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr th:each="row : ${timetable}">
-    <td th:text="${#temporals.format(row.key, 'HH:mm')}"></td>
-    <td th:each="d : ${#numbers.sequence(1,5)}">
-      <div th:each="lesson : ${row.value.get(d)}">
-        <b th:text="${lesson.subjectName}"></b>
-        <span th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
-        <small th:text="#{timetable.room(${lesson.classroom})}"></small>
-      </div>
-    </td>
-  </tr>
-  </tbody>
-</table>
+<div class="container">
+  <h1 th:text="#{timetable.title}">Timetable</h1>
+  <div class="table-wrap">
+    <table>
+      <thead>
+      <tr>
+        <th th:text="#{timetable.time}">Time</th>
+        <th th:each="d : ${#numbers.sequence(1,5)}" th:text="#{${'day.' + d}}">Day</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="row : ${timetable}">
+        <td class="time">
+          <span th:text="${#temporals.format(row.start(), 'HH:mm')}"></span>
+          &ndash;
+          <span th:text="${#temporals.format(row.end(), 'HH:mm')}"></span>
+        </td>
+        <td th:each="d : ${#numbers.sequence(1,5)}">
+          <div class="lesson" th:each="lesson : ${row.lessons().get(d)}">
+            <b th:text="${lesson.subjectName}"></b>
+            <span class="groups" th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
+            <small th:text="#{timetable.room(${lesson.classroom})}"></small>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 </body>
 </html>
