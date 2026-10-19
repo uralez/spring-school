@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title th:text="#{app.title}">Spring School</title>
+</head>
+<body>
+<h1 th:text="#{timetable.title}">Timetable</h1>
+<table border="1" cellpadding="6">
+  <thead>
+  <tr>
+    <th th:text="#{timetable.time}">Time</th>
+    <th th:each="d : ${#numbers.sequence(1,5)}" th:text="#{${'day.' + d}}">Day</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="row : ${timetable}">
+    <td th:text="${#temporals.format(row.key, 'HH:mm')}"></td>
+    <td th:each="d : ${#numbers.sequence(1,5)}">
+      <div th:each="lesson : ${row.value.get(d)}">
+        <b th:text="${lesson.subjectName}"></b>
+        <span th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
+        <small th:text="#{timetable.room(${lesson.classroom})}"></small>
+      </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>
