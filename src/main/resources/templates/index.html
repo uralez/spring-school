@@ -20,6 +20,18 @@
   </div>
 </header>
 <div class="container">
+  <div class="summary">
+    <div class="summary-today">
+      <span th:text="#{summary.today(${#temporals.format(summary.date(), 'dd.MM.yyyy')})}"></span>:
+      <b th:text="#{${'daytype.' + summary.dayType()}}"></b>
+    </div>
+    <div class="chips">
+      <span class="chip" th:text="#{summary.day(${summary.dayNumber()}, ${summary.totalDays()})}"></span>
+      <span class="chip" th:text="#{summary.week(${summary.weekNumber()}, ${summary.totalWeeks()})}"></span>
+      <span class="chip" th:if="${summary.moduleNumber() != null}"
+            th:text="#{summary.module(${summary.moduleNumber()}, ${summary.totalModules()})}"></span>
+    </div>
+  </div>
   <h1 th:text="#{timetable.title}">Timetable</h1>
 
   <div class="table-wrap">
