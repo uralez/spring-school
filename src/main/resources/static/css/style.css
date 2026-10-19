@@ -33,3 +33,9 @@ td.time { background: var(--green-light); color: var(--green-dark); font-weight:
 .lesson b { display: block; color: var(--green-dark); }
 .lesson .groups { font-size: 0.9em; }
 .lesson small { color: #5b6b57; }
+
+.site-header { background: #fff; border-bottom: 4px solid var(--green); }
+.header-inner { display: flex; align-items: center; gap: 16px; }
+.logo { height: 72px; width: auto; }
+.school-name { font-size: 1.8rem; font-weight: 800; color: var(--green-dark); line-height: 1.1; }
+.address { color: #5b6b57; }

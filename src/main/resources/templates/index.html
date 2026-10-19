@@ -4,13 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title th:text="#{app.title}">Spring School</title>
+  <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <img class="logo" th:src="@{/img/leaf.svg}" alt="">
+    <div>
+      <div class="school-name" th:text="#{app.title}">Spring School</div>
+      <div class="address" th:text="#{header.address}">Batumi</div>
+    </div>
+  </div>
+</header>
 <div class="container">
   <h1 th:text="#{timetable.title}">Timetable</h1>
+
   <div class="table-wrap">
     <table>
       <thead>

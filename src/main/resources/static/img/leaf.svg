@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 550" width="100%" height="100%">
+  <defs>
+    <radialGradient id="leafShadow" cx="50%" cy="50%" r="50%" fx="60%" fy="50%">
+      <stop offset="0%" stop-color="#4a5f41" stop-opacity="0.4" />
+      <stop offset="60%" stop-color="#5a6e51" stop-opacity="0.15" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient id="leafBody" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#8ce63f" />
+      <stop offset="40%" stop-color="#64cd26" />
+      <stop offset="80%" stop-color="#3fa610" />
+      <stop offset="100%" stop-color="#2d8208" />
+    </linearGradient>
+    <linearGradient id="stemGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#b6e36b" />
+      <stop offset="50%" stop-color="#c9f28c" />
+      <stop offset="100%" stop-color="#8dbb40" />
+    </linearGradient>
+  </defs>
+
+  <!-- 1. ТЕНЬ -->
+  <ellipse cx="340" cy="460" rx="180" ry="50" fill="url(#leafShadow)" transform="rotate(8, 340, 460)" />
+
+  <g id="complete-leaf">
+    <!-- 2. ОСНОВНАЯ ФОРМА ЗУБЧАТОГО ЛИСТА -->
+    <path d="M 150,330 
+             C 145,290 110,260 120,225
+             C 125,205 150,215 155,195
+             C 160,175 130,145 145,130
+             C 160,115 180,135 195,120
+             C 210,105 190,75 210,70
+             C 230,65 250,95 270,90
+             C 290,85 295,50 320,60
+             C 340,70 340,105 360,110
+             C 380,115 400,90 420,105
+             C 440,120 425,150 445,170
+             C 465,190 490,180 505,210
+             C 515,230 485,250 495,280
+             C 505,305 540,310 535,340
+             C 530,365 495,360 485,390
+             C 475,415 500,450 475,470
+             C 455,485 430,455 405,475
+             C 380,495 365,525 335,520
+             C 310,515 305,480 275,480
+             C 245,480 225,510 200,490
+             C 180,470 190,440 170,410
+             C 155,385 125,370 130,345
+             Z" 
+          fill="url(#leafBody)" 
+          stroke="#429616" 
+          stroke-width="2" 
+          stroke-linejoin="round" />
+
+    <!-- 3. ЦЕНТРАЛЬНАЯ ПРОЖИЛКА И ЧЕРЕНОК (Идеально лежит от края до середины) -->
+    <path d="M 30,350 
+             C 60,362 105,350 148,328 
+             C 240,285 340,265 460,300
+             C 340,255 240,275 152,318
+             C 105,340 60,352 32,342
+             Z" 
+          fill="url(#stemGrad)" />
+          
+    <path d="M 31,346 C 61,357 105,345 150,323 C 240,280 340,260 455,295" 
+          fill="none" 
+          stroke="#e3ffb8" 
+          stroke-width="1.5" 
+          stroke-linecap="round" 
+          opacity="0.6" />
+
+    <!-- 4. БОКОВЫЕ ПРОЖИЛКИ ВЕРХ (Старт строго от стебля) -->
+    <g fill="none" stroke="#a7f054" stroke-width="3" stroke-linecap="round" opacity="0.85">
+      <path d="M 150,323 C 180,260 200,200 195,145" />
+      <path d="M 200,300 C 230,240 280,180 340,110" />
+      <path d="M 265,285 C 310,230 360,190 420,135" />
+      <path d="M 340,273 C 380,225 430,200 480,220" />
+      <path d="M 410,283 C 440,250 470,240 500,250" />
+    </g>
+
+    <!-- 5. БОКОВЫЕ ПРОЖИЛКИ НИЗ (Старт строго от стебля) -->
+    <g fill="none" stroke="#7ad431" stroke-width="3.5" stroke-linecap="round" opacity="0.9">
+      <path d="M 160,322 C 170,360 180,410 185,455" />
+      <path d="M 215,302 C 240,360 260,420 300,490" />
+      <path d="M 285,285 C 330,350 370,410 390,465" />
+      <path d="M 370,277 C 410,330 435,370 460,430" />
+      <path d="M 435,290 C 470,320 495,340 515,365" />
+    </g>
+  </g>
+</svg>
