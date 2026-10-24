@@ -5,3 +5,5 @@
       file: db/changelog/changes/002_insert_schedule_data.sql
   - include:
       file: db/changelog/changes/003_create_academic_modules.sql
+  - include:
+      file: db/changelog/changes/004_fix_schedule.sql
