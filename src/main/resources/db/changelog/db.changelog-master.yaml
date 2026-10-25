@@ -7,3 +7,13 @@
       file: db/changelog/changes/003_create_academic_modules.sql
   - include:
       file: db/changelog/changes/004_fix_schedule.sql
+  - include:
+      file: db/changelog/changes/005_create_textbook_and_subject.sql
+  - include:
+      file: db/changelog/changes/006_insert_physics9.sql
+  - include:
+      file: db/changelog/changes/007_create_course_lesson.sql
+  - include:
+      file: db/changelog/changes/008_fix_lesson_time.sql
+  - include:
+      file: db/changelog/changes/009_generate_physics_plans.sql
