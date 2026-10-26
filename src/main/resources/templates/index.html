@@ -10,15 +10,9 @@
   <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<header class="site-header">
-  <div class="container header-inner">
-    <img class="logo" th:src="@{/img/leaf.svg}" alt="">
-    <div>
-      <div class="school-name" th:text="#{app.title}">Spring School</div>
-      <div class="address" th:text="#{header.address}">Batumi</div>
-    </div>
-  </div>
-</header>
+
+<header th:replace="~{fragments/header :: header}"></header>
+
 <div class="container">
   <div class="summary">
     <div class="summary-today">

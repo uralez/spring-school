@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{subject.title(${name}, ${className})}">Lesson plan</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <h1 th:text="#{subject.title(${name}, ${className})}">Lesson plan</h1>
+    <p th:if="${subject == null}" th:text="#{subject.noplan}">No lesson plan</p>
+    <th:block th:if="${subject != null}"
+              th:with="yearLabel=${subject.academicYear + '–' + #numbers.formatInteger((subject.academicYear + 1) % 100, 2)}">
+        <p class="year" th:text="#{subject.year(${yearLabel})}">Academic year</p>
+        <dl class="textbook" th:if="${subject.textbook != null}">
+            <dt th:text="#{textbook.title}">Title</dt>
+            <dd th:text="${subject.textbook.title}"></dd>
+            <dt th:text="#{textbook.authors}">Authors</dt>
+            <dd th:text="${subject.textbook.authors}"></dd>
+            <dt th:text="#{textbook.publisher}">Publisher</dt>
+            <dd th:text="${subject.textbook.publisher}"></dd>
+            <dt th:text="#{textbook.year}">Year</dt>
+            <dd th:text="${subject.textbook.publicationYear}"></dd>
+            <dt th:text="#{textbook.isbn}">ISBN</dt>
+            <dd th:text="${subject.textbook.isbn}"></dd>
+            <dt th:if="${subject.textbook.publisherUrl != null}" th:text="#{textbook.site}">Website</dt>
+            <dd th:if="${subject.textbook.publisherUrl != null}">
+                <a th:href="${subject.textbook.publisherUrl}" th:text="${subject.textbook.publisherUrl}"></a>
+            </dd>
+        </dl>
+        <div class="table-wrap">
+            <table class="plan">
+                <thead>
+                <tr>
+                    <th th:text="#{plan.weekcol}">Week</th>
+                    <th th:text="#{plan.number}">No.</th>
+                    <th th:text="#{plan.date}">Date</th>
+                    <th th:text="#{plan.topic}">Topic</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="item : ${plan}">
+                    <tr class="module-row" th:if="${item.kind() == 'module'}">
+                        <td colspan="4" th:text="#{plan.module(${item.moduleNumber()})}"></td>
+                    </tr>
+                    <tr class="vacation-row" th:if="${item.kind() == 'vacation'}">
+                        <td colspan="4"
+                            th:text="#{plan.vacation(${#temporals.format(item.from(), 'd MMM', enLocale)}, ${#temporals.format(item.to(), 'd MMM', enLocale)})}"></td>
+                    </tr>
+                    <th:block th:if="${item.kind() == 'week'}">
+                        <tr th:each="l, st : ${item.lessons()}"
+                            th:classappend="${'m' + l.plannedDate.monthValue + (l.lessonType != 'lesson' ? ' row-' + l.lessonType : '') + (l.id == currentId ? ' current' : '')}">
+                            <td th:if="${st.first}" th:rowspan="${st.size}" class="week-cell"
+                                th:classappend="${'m' + l.plannedDate.monthValue}">
+                                <span class="vert" th:text="#{plan.week(${item.weekNumber()})}"></span>
+                            </td>
+                            <td th:text="${l.lessonNumber}"></td>
+                            <td th:text="${#temporals.format(l.plannedDate, 'd MMM, EEE', enLocale)}"></td>
+                            <td th:text="${l.topic}"></td>
+                        </tr>
+                    </th:block>
+                </th:block>
+                </tbody>
+            </table>
+        </div>
+    </th:block>
+</div>
+</body>
+</html>

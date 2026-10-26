@@ -17,3 +17,5 @@
       file: db/changelog/changes/008_fix_lesson_time.sql
   - include:
       file: db/changelog/changes/009_generate_physics_plans.sql
+  - include:
+      file: db/changelog/changes/010_rebuild_physics9_plan.sql
