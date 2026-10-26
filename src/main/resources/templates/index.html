@@ -45,7 +45,8 @@
         </td>
         <td th:each="d : ${#numbers.sequence(1,5)}">
           <div class="lesson" th:each="lesson : ${row.lessons().get(d)}">
-            <b th:text="${lesson.subjectName}"></b>
+            <b th:if="${plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}"><a th:href="@{/subject/{name}/{cls}(name=${lesson.subjectName},cls=${lesson.mainGroup})}" th:text="${lesson.subjectName}"></a></b>
+            <b th:unless="${plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}" th:text="${lesson.subjectName}"></b>
             <span class="groups" th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
             <small th:text="#{timetable.room(${lesson.classroom})}"></small>
           </div>

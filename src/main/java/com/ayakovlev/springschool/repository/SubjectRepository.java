@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long> {
@@ -16,4 +17,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
     Optional<Subject> findByNameYearAndClass(@Param("name") String name,
                                              @Param("year") int year,
                                              @Param("className") String className);
+
+    List<Subject> findByAcademicYear(Integer academicYear);
 }

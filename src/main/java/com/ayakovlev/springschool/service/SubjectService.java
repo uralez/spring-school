@@ -3,6 +3,7 @@ package com.ayakovlev.springschool.service;
 import com.ayakovlev.springschool.dto.PlanItem;
 import com.ayakovlev.springschool.entity.AcademicModule;
 import com.ayakovlev.springschool.entity.CourseLesson;
+import com.ayakovlev.springschool.entity.SchoolClass;
 import com.ayakovlev.springschool.entity.Subject;
 import com.ayakovlev.springschool.repository.AcademicModuleRepository;
 import com.ayakovlev.springschool.repository.CourseLessonRepository;
@@ -15,11 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,5 +76,17 @@ public class SubjectService {
                 .reduce((first, second) -> second)
                 .map(CourseLesson::getId)
                 .orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<String> plannedKeys(LocalDate today) {
+        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
+        Set<String> keys = new HashSet<>();
+        for (Subject s : subjectRepository.findByAcademicYear(year)) {
+            for (SchoolClass c : s.getClasses()) {
+                keys.add(s.getName() + "|" + c.getClassName());
+            }
+        }
+        return keys;
     }
 }

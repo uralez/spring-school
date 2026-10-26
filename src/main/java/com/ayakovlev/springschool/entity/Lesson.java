@@ -30,4 +30,8 @@ public class Lesson {
     @CollectionTable(name = "lesson_groups", joinColumns = @JoinColumn(name = "lesson_id"))
     @Column(name = "class_name")
     private Set<String> groups = new HashSet<>();
+
+    public String getMainGroup() {
+        return groups.stream().sorted().findFirst().orElse("");
+    }
 }
