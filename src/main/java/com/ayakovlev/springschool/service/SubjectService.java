@@ -89,4 +89,9 @@ public class SubjectService {
         }
         return keys;
     }
+
+    @Transactional(readOnly = true)
+    public Optional<CourseLesson> findLesson(Long id) {
+        return courseLessonRepository.findById(id);
+    }
 }

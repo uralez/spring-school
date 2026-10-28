@@ -61,7 +61,7 @@
                             </td>
                             <td th:text="${l.lessonNumber}"></td>
                             <td th:text="${#temporals.format(l.plannedDate, 'd MMM, EEE', enLocale)}"></td>
-                            <td th:text="${l.topic}"></td>
+                            <td><a th:href="@{/lesson/{id}(id=${l.id})}" th:text="${l.topic}"></a></td>
                         </tr>
                     </th:block>
                 </th:block>

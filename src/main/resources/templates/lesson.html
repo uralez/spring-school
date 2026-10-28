@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${lesson.topic}">Lesson</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container lesson-page">
+    <p th:if="${!subject.classes.isEmpty()}">
+        <a th:href="@{/subject/{n}/{c}(n=${subject.name},c=${subject.classes[0].className})}"
+           th:text="'‹ ' + #{lesson.back}">Back</a>
+    </p>
+    <h1 th:text="${lesson.topic}">Topic</h1>
+    <p class="lesson-meta">
+        <span th:text="${subject.name}"></span>,
+        <span th:text="#{lesson.title(${lesson.lessonNumber})}"></span>
+        <span th:if="${lesson.plannedDate != null}"
+              th:text="'· ' + ${#temporals.format(lesson.plannedDate, 'd MMMM yyyy, EEEE', enLocale)}"></span>
+    </p>
+
+    <section class="lesson-section" th:if="${!#strings.isEmpty(lectureHtml)}">
+        <h2 th:text="#{lesson.lecture}">Lecture</h2>
+        <div class="md" th:utext="${lectureHtml}"></div>
+    </section>
+    <section class="lesson-section" th:if="${!#strings.isEmpty(classworkStartHtml)}">
+        <h2 th:text="#{lesson.classwork.start}">Classwork</h2>
+        <div class="md" th:utext="${classworkStartHtml}"></div>
+    </section>
+    <section class="lesson-section" th:if="${!#strings.isEmpty(classworkJointHtml)}">
+        <h2 th:text="#{lesson.classwork.joint}">Classwork</h2>
+        <div class="md" th:utext="${classworkJointHtml}"></div>
+    </section>
+    <section class="lesson-section" th:if="${!#strings.isEmpty(classworkEndHtml)}">
+        <h2 th:text="#{lesson.classwork.end}">Classwork</h2>
+        <div class="md" th:utext="${classworkEndHtml}"></div>
+    </section>
+    <section class="lesson-section" th:if="${!#strings.isEmpty(homeworkHtml)}">
+        <h2 th:text="#{lesson.homework}">Homework</h2>
+        <div class="md" th:utext="${homeworkHtml}"></div>
+    </section>
+
+    <p th:if="${#strings.isEmpty(lectureHtml) and #strings.isEmpty(classworkStartHtml) and #strings.isEmpty(classworkJointHtml) and #strings.isEmpty(classworkEndHtml) and #strings.isEmpty(homeworkHtml)}"
+       th:text="#{lesson.nomaterials}">Not published</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false}
+            ]
+        });
+        hljs.highlightAll();
+    });
+</script>
+</body>
+</html>
