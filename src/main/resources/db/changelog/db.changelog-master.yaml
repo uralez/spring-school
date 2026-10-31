@@ -19,3 +19,5 @@
       file: db/changelog/changes/009_generate_physics_plans.sql
   - include:
       file: db/changelog/changes/010_rebuild_physics9_plan.sql
+  - include:
+      file: db/changelog/changes/011_create_app_user.sql
