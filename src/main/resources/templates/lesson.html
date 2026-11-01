@@ -18,6 +18,11 @@
         <a th:href="@{/subject/{n}/{c}(n=${subject.name},c=${subject.classes[0].className})}"
            th:text="'‹ ' + #{lesson.back}">Back</a>
     </p>
+
+    <p th:if="${isAdmin}">
+        <a th:href="@{/admin/lesson/{id}/edit(id=${lesson.id})}" th:text="#{admin.lesson.edit}">Edit</a>
+    </p>
+
     <h1 th:text="${lesson.topic}">Topic</h1>
     <p class="lesson-meta">
         <span th:text="${subject.name}"></span>,
@@ -44,6 +49,8 @@
     </section>
     <section class="lesson-section" th:if="${!#strings.isEmpty(homeworkHtml)}">
         <h2 th:text="#{lesson.homework}">Homework</h2>
+        <p class="due" th:if="${homeworkDue != null}"
+           th:text="#{lesson.homework.due(${#temporals.format(homeworkDue, 'EEEE, d MMMM', enLocale)})}"></p>
         <div class="md" th:utext="${homeworkHtml}"></div>
     </section>
 

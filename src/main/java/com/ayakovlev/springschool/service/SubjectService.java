@@ -10,8 +10,10 @@ import com.ayakovlev.springschool.repository.CourseLessonRepository;
 import com.ayakovlev.springschool.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -94,4 +96,34 @@ public class SubjectService {
     public Optional<CourseLesson> findLesson(Long id) {
         return courseLessonRepository.findById(id);
     }
+
+    @Transactional
+    public CourseLesson updateLesson(Long id, String topic, String comment, LocalDate actualDate,
+                                     String lecture, String classworkStart, String classworkJoint,
+                                     String classworkEnd, String homework) {
+        CourseLesson lesson = courseLessonRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        lesson.setTopic(blankToNull(topic));
+        lesson.setComment(blankToNull(comment));
+        lesson.setActualDate(actualDate);
+        lesson.setLecture(blankToNull(lecture));
+        lesson.setClassworkStart(blankToNull(classworkStart));
+        lesson.setClassworkJoint(blankToNull(classworkJoint));
+        lesson.setClassworkEnd(blankToNull(classworkEnd));
+        lesson.setHomework(blankToNull(homework));
+        return lesson;
+    }
+
+    private String blankToNull(String s) {
+        return s == null || s.isBlank() ? null : s;
+    }
+
+    @Transactional(readOnly = true)
+    public LocalDate nextLessonDate(CourseLesson lesson) {
+        return courseLessonRepository
+                .findBySubjectIdAndLessonNumber(lesson.getSubject().getId(), lesson.getLessonNumber() + 1)
+                .map(CourseLesson::getPlannedDate)
+                .orElse(null);
+    }
+
 }

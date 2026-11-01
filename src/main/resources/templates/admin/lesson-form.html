@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{admin.lesson.edit}">Edit lesson</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <h1 th:text="#{admin.lesson.edit}">Edit lesson</h1>
+    <form th:action="@{/admin/lesson/{id}(id=${lesson.id})}" method="post" class="lesson-form">
+        <label th:text="#{admin.lesson.topic}">Topic</label>
+        <input type="text" name="topic" th:value="${lesson.topic}">
+        <label th:text="#{admin.lesson.actualdate}">Actual date</label>
+        <input type="date" name="actualDate" th:value="${lesson.actualDate}">
+        <label th:text="#{admin.lesson.comment}">Comment</label>
+        <textarea name="comment" rows="2" th:text="${lesson.comment}"></textarea>
+
+        <p class="form-hint" th:text="#{admin.lesson.hint}"></p>
+
+        <details class="cheatsheet">
+            <summary th:text="#{admin.lesson.cheatsheet}">Formatting help</summary>
+            <table>
+                <tr><td><code>## Heading</code></td><td>heading</td></tr>
+                <tr><td><code>**bold**</code>, <code>*italic*</code></td><td>bold, italic</td></tr>
+                <tr><td><code>- item</code></td><td>bullet list</td></tr>
+                <tr><td><code>1. item</code></td><td>numbered list</td></tr>
+                <tr><td><code>`code`</code></td><td>code inside a line</td></tr>
+                <tr><td><code>$x^2$</code></td><td>formula inside a line</td></tr>
+                <tr><td><code>$$x^2$$</code></td><td>formula as a separate centered block</td></tr>
+                <tr><td><code>\frac{a}{b}</code></td><td>fraction (inside a formula)</td></tr>
+                <tr><td><code>x^2</code>, <code>x_1</code></td><td>power, index (inside a formula)</td></tr>
+                <tr><td><code>\sqrt{x}</code></td><td>square root (inside a formula)</td></tr>
+                <tr><td><code>\text{m/s}</code></td><td>plain text, units (inside a formula)</td></tr>
+                <tr><td><code>\cdot</code>, <code>\Delta</code>, <code>\alpha</code></td><td>multiply dot, Greek letters</td></tr>
+            </table>
+        </details>
+
+        <label th:text="#{lesson.lecture}">Lecture</label>
+        <textarea name="lecture" rows="10" class="md-input" th:text="${lesson.lecture}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <label th:text="#{lesson.classwork.start}">Classwork</label>
+        <textarea name="classworkStart" rows="6" class="md-input" th:text="${lesson.classworkStart}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <label th:text="#{lesson.classwork.joint}">Classwork</label>
+        <textarea name="classworkJoint" rows="6" class="md-input" th:text="${lesson.classworkJoint}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <label th:text="#{lesson.classwork.end}">Classwork</label>
+        <textarea name="classworkEnd" rows="6" class="md-input" th:text="${lesson.classworkEnd}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <label th:text="#{lesson.homework}">Homework</label>
+        <textarea name="homework" rows="6" class="md-input" th:text="${lesson.homework}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <div class="form-buttons">
+            <button type="submit" class="btn-save" th:text="#{admin.lesson.save}">Save</button>
+            <a th:href="@{/lesson/{id}(id=${lesson.id})}" th:text="#{admin.lesson.cancel}">Cancel</a>
+        </div>
+    </form>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script th:src="@{/js/lesson-form.js}"></script>
+</body>
+</html>

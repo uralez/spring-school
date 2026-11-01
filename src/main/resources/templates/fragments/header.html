@@ -8,6 +8,15 @@
             <div class="school-name" th:text="#{app.title}">Spring School</div>
             <div class="address" th:text="#{header.address}">Batumi</div>
         </div>
+        <div class="auth">
+            <a th:if="${currentUser == null}" th:href="@{/login}" th:text="#{header.signin}">Sign in</a>
+            <th:block th:if="${currentUser != null}">
+                <span th:text="${currentUser}"></span>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit" th:text="#{header.signout}">Sign out</button>
+                </form>
+            </th:block>
+        </div>
     </div>
 </header>
 </body>

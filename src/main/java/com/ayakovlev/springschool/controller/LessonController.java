@@ -5,6 +5,7 @@ import com.ayakovlev.springschool.service.MarkdownService;
 import com.ayakovlev.springschool.service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class LessonController {
     private final MarkdownService markdownService;
 
     @GetMapping("/lesson/{id}")
-    public String lesson(@PathVariable Long id, Model model) {
+    public String lesson(@PathVariable Long id, Model model, Authentication authentication) {
         CourseLesson lesson = subjectService.findLesson(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         model.addAttribute("lesson", lesson);
@@ -30,6 +31,9 @@ public class LessonController {
         model.addAttribute("classworkEndHtml", markdownService.toHtml(lesson.getClassworkEnd()));
         model.addAttribute("homeworkHtml", markdownService.toHtml(lesson.getHomework()));
         model.addAttribute("enLocale", java.util.Locale.ENGLISH);
+        model.addAttribute("isAdmin", authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
+        model.addAttribute("homeworkDue", subjectService.nextLessonDate(lesson));
         return "lesson";
     }
 }
