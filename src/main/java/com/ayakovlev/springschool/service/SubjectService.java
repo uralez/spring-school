@@ -137,4 +137,14 @@ public class SubjectService {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public List<Subject> subjects(LocalDate today) {
+        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
+        return subjectRepository.findByAcademicYear(year);
+    }
+
+    @Transactional(readOnly = true)
+    public Subject subject(Long id) {
+        return subjectRepository.findById(id).orElseThrow();
+    }
 }

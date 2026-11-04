@@ -8,4 +8,6 @@ import java.util.List;
 public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long> {
 
     List<StudentGrade> findByCourseLessonIdOrderByDcre(Long courseLessonId);
+
+    List<StudentGrade> findByCourseLessonSubjectIdOrderByDcre(Long subjectId);
 }

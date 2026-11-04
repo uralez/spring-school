@@ -2,6 +2,7 @@ package com.ayakovlev.springschool.controller;
 
 import com.ayakovlev.springschool.entity.CourseLesson;
 import com.ayakovlev.springschool.entity.SchoolClass;
+import com.ayakovlev.springschool.service.GradeService;
 import com.ayakovlev.springschool.service.SubjectService;
 import com.ayakovlev.springschool.service.MarkdownService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class AdminLessonController {
 
     private final SubjectService subjectService;
     private final MarkdownService markdownService;
+    private final GradeService gradeService;
 
     @GetMapping("/{id}/edit")
     public String form(@PathVariable Long id, Model model) {
@@ -59,4 +61,18 @@ public class AdminLessonController {
     public String preview(@RequestParam(required = false) String text) {
         return markdownService.toHtml(text);
     }
+
+    @PostMapping("/{id}/grades")
+    public String addGrade(@PathVariable Long id,
+                           @RequestParam Long studentId,
+                           @RequestParam String kind,
+                           @RequestParam int score,
+                           @RequestParam(required = false) String comment) {
+        if (score < 0 || score > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        gradeService.addGrade(id, studentId, kind, score, comment);
+        return "redirect:/lesson/" + id + "#grades";
+    }
+
 }

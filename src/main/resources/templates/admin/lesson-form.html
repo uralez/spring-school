@@ -55,12 +55,12 @@
             </table>
         </details>
 
-        <label th:text="#{lesson.lecture}">Lecture</label>
-        <textarea name="lecture" rows="10" class="md-input" th:text="${lesson.lecture}"></textarea>
-        <div class="md preview" hidden></div>
-
         <label th:text="#{lesson.classwork.start}">Classwork</label>
         <textarea name="classworkStart" rows="6" class="md-input" th:text="${lesson.classworkStart}"></textarea>
+        <div class="md preview" hidden></div>
+
+        <label th:text="#{lesson.lecture}">Lecture</label>
+        <textarea name="lecture" rows="10" class="md-input" th:text="${lesson.lecture}"></textarea>
         <div class="md preview" hidden></div>
 
         <label th:text="#{lesson.classwork.joint}">Classwork</label>

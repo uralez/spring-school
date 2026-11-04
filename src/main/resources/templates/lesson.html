@@ -34,13 +34,13 @@
               th:text="'· ' + ${#temporals.format(lesson.plannedDate, 'd MMMM yyyy, EEEE', enLocale)}"></span>
     </p>
 
-    <section class="lesson-section" th:if="${!#strings.isEmpty(lectureHtml)}">
-        <h2 th:text="#{lesson.lecture}">Lecture</h2>
-        <div class="md" th:utext="${lectureHtml}"></div>
-    </section>
     <section class="lesson-section" th:if="${!#strings.isEmpty(classworkStartHtml)}">
         <h2 th:text="#{lesson.classwork.start}">Classwork</h2>
         <div class="md" th:utext="${classworkStartHtml}"></div>
+    </section>
+    <section class="lesson-section" th:if="${!#strings.isEmpty(lectureHtml)}">
+        <h2 th:text="#{lesson.lecture}">Lecture</h2>
+        <div class="md" th:utext="${lectureHtml}"></div>
     </section>
     <section class="lesson-section" th:if="${!#strings.isEmpty(classworkJointHtml)}">
         <h2 th:text="#{lesson.classwork.joint}">Classwork</h2>
@@ -55,6 +55,61 @@
         <p class="due" th:if="${homeworkDue != null}"
            th:text="#{lesson.homework.due(${#temporals.format(homeworkDue, 'EEEE, d MMMM', enLocale)})}"></p>
         <div class="md" th:utext="${homeworkHtml}"></div>
+    </section>
+
+    <section class="lesson-section no-print" id="grades" th:if="${isAdmin}">
+        <h2 th:text="#{grades.title}">Grades</h2>
+        <p th:if="${grades.isEmpty()}" th:text="#{grades.none}">No grades</p>
+        <table class="grade-table" th:unless="${grades.isEmpty()}">
+            <thead>
+            <tr>
+                <th th:text="#{grades.student}">Student</th>
+                <th th:text="#{grades.score}">Score</th>
+                <th th:text="#{grades.comment}">Comment</th>
+                <th th:text="#{grades.when}">Time</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="g : ${grades}">
+                <td th:text="${g.student.user.fullName}"></td>
+                <td th:text="${g.score}"></td>
+                <td th:text="${g.comment}"></td>
+                <td th:text="${#temporals.format(g.dcre, 'd MMM HH:mm', enLocale)}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p><button type="button" id="open-grade" class="btn-fill" th:text="#{grades.add}">Add grade</button></p>
+
+        <dialog id="grade-dialog" class="prompt-dialog">
+            <h2 th:text="#{grades.add}">Add grade</h2>
+            <form th:action="@{/admin/lesson/{id}/grades(id=${lesson.id})}" method="post" class="lesson-form">
+                <label for="g-student" th:text="#{grades.student}">Student</label>
+
+
+                <select id="g-student" name="studentId" class="fancy-select" required>
+                    <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.user.fullName}"></option>
+                </select>
+                <label for="g-kind" th:text="#{grades.kind}">Type</label>
+                <select id="g-kind" name="kind" class="fancy-select">
+                    <option value="" th:selected="${lesson.lessonType != 'test'}"></option>
+                    <option value="classwork_start">Independent work (start)</option>
+                    <option value="classwork_end">Independent work (end)</option>
+                    <option value="homework">Homework</option>
+                    <option value="board">Board work</option>
+                    <option value="test" th:selected="${lesson.lessonType == 'test'}">Test</option>
+                    <option value="retake">Retake</option>
+                </select>
+
+                <label for="g-score" th:text="#{grades.score}">Score</label>
+                <input id="g-score" type="number" name="score" min="0" max="100" required>
+                <label for="g-comment" th:text="#{grades.comment}">Comment</label>
+                <textarea id="g-comment" name="comment" rows="3"></textarea>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save" th:text="#{grades.save}">Save</button>
+                    <button type="button" id="close-grade" th:text="#{grades.cancel}">Cancel</button>
+                </div>
+            </form>
+        </dialog>
     </section>
 
     <p th:if="${#strings.isEmpty(lectureHtml) and #strings.isEmpty(classworkStartHtml) and #strings.isEmpty(classworkJointHtml) and #strings.isEmpty(classworkEndHtml) and #strings.isEmpty(homeworkHtml)}"
@@ -74,6 +129,15 @@
         });
         hljs.highlightAll();
     });
+</script>
+<script>
+    (function () {
+        var open = document.getElementById('open-grade');
+        var dialog = document.getElementById('grade-dialog');
+        if (!open || !dialog) { return; }
+        open.addEventListener('click', function () { dialog.showModal(); });
+        document.getElementById('close-grade').addEventListener('click', function () { dialog.close(); });
+    })();
 </script>
 </body>
 </html>
