@@ -126,4 +126,15 @@ public class SubjectService {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public String previousTopic(CourseLesson lesson) {
+        if (lesson.getLessonNumber() <= 1) {
+            return null;
+        }
+        return courseLessonRepository
+                .findBySubjectIdAndLessonNumber(lesson.getSubject().getId(), lesson.getLessonNumber() - 1)
+                .map(CourseLesson::getTopic)
+                .orElse(null);
+    }
+
 }

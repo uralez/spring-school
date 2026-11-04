@@ -17,6 +17,17 @@
 <div class="container">
     <h1 th:text="#{admin.lesson.edit}">Edit lesson</h1>
     <form th:action="@{/admin/lesson/{id}(id=${lesson.id})}" method="post" class="lesson-form">
+
+        <div class="form-buttons">
+            <button type="button" id="open-prompt" class="btn-fill" th:text="#{prompt.open}">Generate prompt</button>
+        </div>
+
+        <label for="paste-lesson" th:text="#{admin.lesson.paste}">Paste a whole lesson</label>
+        <textarea id="paste-lesson" rows="5"></textarea>
+        <div class="form-buttons">
+            <button type="button" id="paste-apply" class="btn-fill" th:text="#{admin.lesson.fill}">Fill the form</button>
+        </div>
+
         <label th:text="#{admin.lesson.topic}">Topic</label>
         <input type="text" name="topic" th:value="${lesson.topic}">
         <label th:text="#{admin.lesson.actualdate}">Actual date</label>
@@ -69,9 +80,38 @@
             <a th:href="@{/lesson/{id}(id=${lesson.id})}" th:text="#{admin.lesson.cancel}">Cancel</a>
         </div>
     </form>
+
+    <dialog id="prompt-dialog" class="prompt-dialog"
+            th:attr="data-subject=${promptSubject}, data-class=${promptClasses}, data-lang=${promptLanguage}, data-topic=${lesson.topic}, data-prev=${promptPrevTopic}">
+        <h2 th:text="#{prompt.title}">Prompt for the AI</h2>
+        <div class="prompt-grid">
+            <label for="p-subject" th:text="#{prompt.subject}">Subject</label>
+            <input id="p-subject" type="text">
+            <label for="p-class" th:text="#{prompt.class}">Class</label>
+            <input id="p-class" type="text">
+            <label for="p-topic" th:text="#{prompt.topic}">Topic</label>
+            <input id="p-topic" type="text">
+            <label for="p-count" th:text="#{prompt.count}">Number of lessons</label>
+            <input id="p-count" type="number" min="1" max="20">
+            <label for="p-lang" th:text="#{prompt.lang}">Main language</label>
+            <select id="p-lang"><option value="EN">EN</option><option value="RU">RU</option></select>
+        </div>
+        <div class="form-buttons">
+            <button type="button" id="p-generate" class="btn-fill" disabled th:text="#{prompt.generate}">Generate prompt</button>
+            <button type="button" id="p-close" th:text="#{prompt.close}">Close</button>
+        </div>
+        <textarea id="p-text" rows="16" hidden></textarea>
+        <div class="form-buttons">
+            <button type="button" id="p-copy" class="btn-fill" hidden th:text="#{prompt.copy}">Copy</button>
+        </div>
+    </dialog>
+
 </div>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script th:src="@{/js/lesson-form.js}"></script>
+
+<script th:src="@{/js/prompt.js}"></script>
+
 </body>
 </html>

@@ -14,13 +14,16 @@
 <body>
 <header th:replace="~{fragments/header :: header}"></header>
 <div class="container lesson-page">
-    <p th:if="${!subject.classes.isEmpty()}">
+    <p th:if="${!subject.classes.isEmpty()}" class="no-print">
         <a th:href="@{/subject/{n}/{c}(n=${subject.name},c=${subject.classes[0].className})}"
            th:text="'‹ ' + #{lesson.back}">Back</a>
     </p>
 
-    <p th:if="${isAdmin}">
+    <p th:if="${isAdmin}" class="no-print">
         <a th:href="@{/admin/lesson/{id}/edit(id=${lesson.id})}" th:text="#{admin.lesson.edit}">Edit</a>
+    </p>
+    <p class="no-print">
+        <button type="button" class="btn-print" onclick="window.print()" th:text="#{lesson.print}">Print</button>
     </p>
 
     <h1 th:text="${lesson.topic}">Topic</h1>
