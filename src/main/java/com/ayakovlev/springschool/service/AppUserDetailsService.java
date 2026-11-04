@@ -22,6 +22,9 @@ public class AppUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username));
+        if (user.getPasswordHash() == null) {
+            throw new UsernameNotFoundException(username);
+        }
         return new User(user.getUsername(), user.getPasswordHash(),
                 user.getRoles().stream().map(r -> new SimpleGrantedAuthority("ROLE_" + r)).toList());
     }
