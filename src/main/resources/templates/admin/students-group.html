@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{students.group(${group.name})}">Group</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <p><a th:href="@{/admin/students}" th:text="'‹ ' + #{students.back}">Back</a></p>
+    <h1 th:text="#{students.group(${group.name})}">Group</h1>
+    <p th:if="${members.isEmpty()}" th:text="#{students.empty}">No students</p>
+    <ol class="student-list">
+        <li th:each="m : ${members}" th:text="${m.student.user.fullName}"></li>
+    </ol>
+    <form th:action="@{/admin/students/{id}(id=${group.id})}" method="post" class="lesson-form">
+        <label for="fullName" th:text="#{students.name}">Full name</label>
+        <input id="fullName" type="text" name="fullName" required>
+        <div class="form-buttons">
+            <button type="submit" class="btn-save" th:text="#{students.add}">Add student</button>
+        </div>
+    </form>
+</div>
+</body>
+</html>

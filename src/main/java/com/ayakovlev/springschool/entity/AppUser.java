@@ -15,6 +15,7 @@ public class AppUser extends BaseEntity {
 
     private String username;
     private String passwordHash;
+    private String fullName;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "app_user_role", joinColumns = @JoinColumn(name = "user_id"))

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{students.title}">Students</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <h1 th:text="#{students.title}">Students</h1>
+    <ul class="group-list">
+        <li th:each="g : ${groups}">
+            <a th:href="@{/admin/students/{id}(id=${g.id})}" th:text="#{students.group(${g.name})}"></a>
+            <span th:text="'(' + ${g.classYear.name} + ')'"></span>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
