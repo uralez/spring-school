@@ -34,6 +34,14 @@
               th:text="'· ' + ${#temporals.format(lesson.plannedDate, 'd MMMM yyyy, EEEE', enLocale)}"></span>
     </p>
 
+    <nav class="lesson-nav no-print">
+        <a th:if="${prevLesson != null}" th:href="@{/lesson/{id}(id=${prevLesson.id})}"
+           th:text="'‹ ' + #{lesson.prev(${prevLesson.plannedDate != null ? #temporals.format(prevLesson.plannedDate, 'd MMM, EEE', enLocale) : ''})}"></a>
+        <span th:if="${prevLesson == null}"></span>
+        <a th:if="${nextLesson != null}" th:href="@{/lesson/{id}(id=${nextLesson.id})}"
+           th:text="#{lesson.next(${nextLesson.plannedDate != null ? #temporals.format(nextLesson.plannedDate, 'd MMM, EEE', enLocale) : ''})} + ' ›'"></a>
+    </nav>
+
     <section class="lesson-section" th:if="${!#strings.isEmpty(classworkStartHtml)}">
         <h2 th:text="#{lesson.classwork.start}">Classwork</h2>
         <div class="md" th:utext="${classworkStartHtml}"></div>

@@ -188,3 +188,7 @@ td.time { background: var(--green-light); color: var(--green-dark); font-weight:
 .main-nav { display: flex; flex-wrap: wrap; gap: 16px; margin-left: 24px; }
 .main-nav a { color: var(--green-dark); font-weight: 700; text-decoration: none; }
 .main-nav a:hover { text-decoration: underline; }
+
+.lesson-nav { display: flex; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
+.lesson-nav a { color: var(--green-dark); font-weight: 700; text-decoration: none; }
+.lesson-nav a:hover { text-decoration: underline; }

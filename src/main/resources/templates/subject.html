@@ -96,5 +96,9 @@
         </div>
     </th:block>
 </div>
+<script>
+    var current = document.querySelector('tr.current');
+    if (current) { current.scrollIntoView({block: 'center'}); }
+</script>
 </body>
 </html>

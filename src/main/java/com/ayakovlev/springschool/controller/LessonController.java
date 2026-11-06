@@ -36,6 +36,8 @@ public class LessonController {
         model.addAttribute("isAdmin", authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")));
         model.addAttribute("homeworkDue", subjectService.nextLessonDate(lesson));
+        model.addAttribute("prevLesson", subjectService.neighbor(lesson, -1).orElse(null));
+        model.addAttribute("nextLesson", subjectService.neighbor(lesson, 1).orElse(null));
 
         if (Boolean.TRUE.equals(model.getAttribute("isAdmin"))) {
             model.addAttribute("students", gradeService.studentsFor(lesson));
@@ -44,4 +46,5 @@ public class LessonController {
 
         return "lesson";
     }
+
 }

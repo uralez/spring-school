@@ -166,4 +166,10 @@ public class SubjectService {
     private String blank(String s) {
         return s == null || s.isBlank() ? null : s.trim();
     }
+
+    @Transactional(readOnly = true)
+    public Optional<CourseLesson> neighbor(CourseLesson lesson, int delta) {
+        return courseLessonRepository.findBySubjectIdAndLessonNumber(
+                lesson.getSubject().getId(), lesson.getLessonNumber() + delta);
+    }
 }
