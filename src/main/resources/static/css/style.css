@@ -192,3 +192,6 @@ td.time { background: var(--green-light); color: var(--green-dark); font-weight:
 .lesson-nav { display: flex; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
 .lesson-nav a { color: var(--green-dark); font-weight: 700; text-decoration: none; }
 .lesson-nav a:hover { text-decoration: underline; }
+
+.approval { margin: 16px 0; font-weight: 700; color: var(--green-dark); }
+.approval a { text-decoration: none; margin-left: 8px; }

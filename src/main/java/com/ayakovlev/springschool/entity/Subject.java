@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +19,8 @@ public class Subject extends BaseEntity {
     private String name;
     private Integer academicYear;
     private String language;
+    private String approvedBy;
+    private LocalDate approvedOn;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "textbook_id")

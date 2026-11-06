@@ -172,4 +172,11 @@ public class SubjectService {
         return courseLessonRepository.findBySubjectIdAndLessonNumber(
                 lesson.getSubject().getId(), lesson.getLessonNumber() + delta);
     }
+
+    @Transactional
+    public void approve(Long subjectId, String approvedBy, LocalDate approvedOn) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow();
+        subject.setApprovedBy(approvedBy == null || approvedBy.isBlank() ? null : approvedBy.trim());
+        subject.setApprovedOn(approvedOn);
+    }
 }

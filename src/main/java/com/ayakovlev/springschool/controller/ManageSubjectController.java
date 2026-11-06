@@ -3,12 +3,15 @@ package com.ayakovlev.springschool.controller;
 import com.ayakovlev.springschool.entity.Subject;
 import com.ayakovlev.springschool.service.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,6 +31,16 @@ public class ManageSubjectController {
                                @RequestParam(required = false) String publisherUrl,
                                @RequestParam(required = false) String fileUrl) {
         subjectService.saveTextbook(id, title, authors, publisher, publicationYear, isbn, publisherUrl, fileUrl);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
+    }
+
+    @PostMapping("/{id}/approval")
+    @PreAuthorize("@access.canApprove(authentication)")
+    public String approve(@PathVariable Long id,
+                          @RequestParam String approvedBy,
+                          @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate approvedOn) {
+        subjectService.approve(id, approvedBy, approvedOn);
         Subject subject = subjectService.subject(id);
         return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
     }

@@ -94,6 +94,35 @@
                 </tbody>
             </table>
         </div>
+        <p class="approval">
+            <span th:if="${subject.approvedBy != null}"
+                  th:text="#{approval.done(${subject.approvedBy}, ${#temporals.format(subject.approvedOn, 'dd.MM.yyyy')})}"></span>
+                    <span th:if="${subject.approvedBy == null}">
+                <span th:text="#{approval.must}"></span>
+            </span>
+            <a th:if="${canApprove}" href="#" id="open-approval">✎</a>
+        </p>
+        <dialog id="approval-dialog" class="prompt-dialog" th:if="${canApprove}">
+            <form th:action="@{/manage/subject/{id}/approval(id=${subject.id})}" method="post" class="lesson-form">
+                <label for="a-by" th:text="#{approval.by}">Approved by</label>
+                <input id="a-by" name="approvedBy" th:value="${subject.approvedBy}" required>
+                <label for="a-on" th:text="#{approval.on}">Date</label>
+                <input id="a-on" name="approvedOn" type="date" th:value="${subject.approvedOn}" required>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save" th:text="#{approval.save}">Save</button>
+                    <button type="button" id="close-approval" th:text="#{approval.cancel}">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+        <script th:if="${canApprove}">
+            document.getElementById('open-approval').addEventListener('click', function (e) {
+                e.preventDefault();
+                document.getElementById('approval-dialog').showModal();
+            });
+            document.getElementById('close-approval').addEventListener('click', function () {
+                document.getElementById('approval-dialog').close();
+            });
+        </script>
     </th:block>
 </div>
 <script>

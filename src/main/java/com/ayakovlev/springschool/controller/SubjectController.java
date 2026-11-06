@@ -31,6 +31,7 @@ public class SubjectController {
             model.addAttribute("currentId", subjectService.currentLessonId(subject.get().getId(), LocalDate.now()));
             model.addAttribute("enLocale", java.util.Locale.ENGLISH);
             model.addAttribute("canEdit", access.canEditSubject(authentication, subject.get().getId()));
+            model.addAttribute("canApprove", access.canApprove(authentication));
         }
         return "subject";
     }

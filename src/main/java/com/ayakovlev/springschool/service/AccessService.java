@@ -13,6 +13,7 @@ import java.util.Set;
 public class AccessService {
 
     private static final Set<String> EDIT_PLAN = Set.of("ADMIN", "TEACHER", "METHODIST");
+    private static final Set<String> APPROVE = Set.of("ADMIN", "DIRECTOR", "DEPUTY", "METHODIST");
 
     private final SubjectRepository subjectRepository;
 
@@ -45,5 +46,10 @@ public class AccessService {
                 .map(s -> s.getTeachers().stream()
                         .anyMatch(t -> t.getUser().getUsername().equals(authentication.getName())))
                 .orElse(false);
+    }
+
+    public boolean canApprove(Authentication authentication) {
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(a -> APPROVE.contains(a.getAuthority().replace("ROLE_", "")));
     }
 }
