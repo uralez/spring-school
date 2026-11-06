@@ -27,3 +27,5 @@
       file: db/changelog/changes/013_create_teacher.sql
   - include:
       file: db/changelog/changes/014_add_subject_approval.sql
+  - include:
+      file: db/changelog/changes/015_fix_april_holidays.sql
