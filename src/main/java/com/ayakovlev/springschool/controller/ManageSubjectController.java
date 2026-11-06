@@ -1,0 +1,34 @@
+package com.ayakovlev.springschool.controller;
+
+import com.ayakovlev.springschool.entity.Subject;
+import com.ayakovlev.springschool.service.SubjectService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+@Controller
+@RequiredArgsConstructor
+@RequestMapping("/manage/subject")
+public class ManageSubjectController {
+
+    private final SubjectService subjectService;
+
+    @PostMapping("/{id}/textbook")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String saveTextbook(@PathVariable Long id,
+                               @RequestParam String title,
+                               @RequestParam(required = false) String authors,
+                               @RequestParam(required = false) String publisher,
+                               @RequestParam(required = false) Integer publicationYear,
+                               @RequestParam(required = false) String isbn,
+                               @RequestParam(required = false) String publisherUrl,
+                               @RequestParam(required = false) String fileUrl) {
+        subjectService.saveTextbook(id, title, authors, publisher, publicationYear, isbn, publisherUrl, fileUrl);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
+    }
+}

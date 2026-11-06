@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface CalendarDayRepository extends JpaRepository<CalendarDay, LocalDate> {
 
@@ -20,4 +21,6 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, LocalD
 
     @Query(value = "SELECT COUNT(DISTINCT date_trunc('week', calendar_date)) FROM academic_calendar WHERE day_type = 'working'", nativeQuery = true)
     long countWorkingWeeks();
+
+    List<CalendarDay> findByDayTypeOrderByCalendarDate(String dayType);
 }

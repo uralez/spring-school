@@ -1,13 +1,11 @@
 package com.ayakovlev.springschool.service;
 
 import com.ayakovlev.springschool.dto.PlanItem;
-import com.ayakovlev.springschool.entity.AcademicModule;
-import com.ayakovlev.springschool.entity.CourseLesson;
-import com.ayakovlev.springschool.entity.SchoolClass;
-import com.ayakovlev.springschool.entity.Subject;
+import com.ayakovlev.springschool.entity.*;
 import com.ayakovlev.springschool.repository.AcademicModuleRepository;
 import com.ayakovlev.springschool.repository.CourseLessonRepository;
 import com.ayakovlev.springschool.repository.SubjectRepository;
+import com.ayakovlev.springschool.repository.TextbookRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -28,6 +26,7 @@ public class SubjectService {
     private final SubjectRepository subjectRepository;
     private final CourseLessonRepository courseLessonRepository;
     private final AcademicModuleRepository academicModuleRepository;
+    private final TextbookRepository textbookRepository;
 
     @Transactional(readOnly = true)
     public Optional<Subject> find(String name, String className, LocalDate today) {
@@ -146,5 +145,25 @@ public class SubjectService {
     @Transactional(readOnly = true)
     public Subject subject(Long id) {
         return subjectRepository.findById(id).orElseThrow();
+    }
+
+    @Transactional
+    public void saveTextbook(Long subjectId, String title, String authors, String publisher,
+                             Integer year, String isbn, String publisherUrl, String fileUrl) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow();
+        Textbook textbook = subject.getTextbook() != null ? subject.getTextbook() : new Textbook();
+        textbook.setTitle(title.trim());
+        textbook.setAuthors(blank(authors));
+        textbook.setPublisher(blank(publisher));
+        textbook.setPublicationYear(year);
+        textbook.setIsbn(blank(isbn));
+        textbook.setPublisherUrl(blank(publisherUrl));
+        textbook.setFileUrl(blank(fileUrl));
+        textbookRepository.save(textbook);
+        subject.setTextbook(textbook);
+    }
+
+    private String blank(String s) {
+        return s == null || s.isBlank() ? null : s.trim();
     }
 }

@@ -5,7 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "subject")
@@ -24,4 +26,10 @@ public class Subject extends BaseEntity {
     @ElementCollection
     @CollectionTable(name = "subject_class", joinColumns = @JoinColumn(name = "subject_id"))
     private List<SchoolClass> classes = new ArrayList<>();
+
+    @ManyToMany
+    @JoinTable(name = "subject_teacher",
+            joinColumns = @JoinColumn(name = "subject_id"),
+            inverseJoinColumns = @JoinColumn(name = "teacher_id"))
+    private Set<Teacher> teachers = new HashSet<>();
 }

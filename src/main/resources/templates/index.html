@@ -49,6 +49,10 @@
             <b th:unless="${plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}" th:text="${lesson.subjectName}"></b>
             <span class="groups" th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
             <small th:text="#{timetable.room(${lesson.classroom})}"></small>
+            <form th:if="${canEditPlans and !plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}"
+                  th:action="@{/manage/plan/create/{id}(id=${lesson.id})}" method="post" class="plan-create">
+              <button type="submit" th:title="#{timetable.createplan}">+</button>
+            </form>
           </div>
         </td>
       </tr>

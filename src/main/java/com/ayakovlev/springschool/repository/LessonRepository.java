@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface LessonRepository extends JpaRepository<Lesson, Integer> {
@@ -18,4 +19,11 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
             ORDER BY l.dayOfWeek, l.startTime
             """)
     List<Lesson> findActiveOn(@Param("date") LocalDate date);
+
+    @Query("""
+        SELECT DISTINCT l FROM Lesson l JOIN l.groups g
+        WHERE l.subjectName = :name AND g IN :groups
+        ORDER BY l.startTime
+        """)
+    List<Lesson> findBySubjectAndGroups(@Param("name") String name, @Param("groups") Collection<String> groups);
 }

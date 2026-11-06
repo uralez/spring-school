@@ -17,7 +17,33 @@
     <th:block th:if="${subject != null}"
               th:with="yearLabel=${subject.academicYear + '–' + #numbers.formatInteger((subject.academicYear + 1) % 100, 2)}">
         <p class="year" th:text="#{subject.year(${yearLabel})}">Academic year</p>
-        <dl class="textbook" th:if="${subject.textbook != null}">
+
+        <form th:if="${canEdit}" th:action="@{/manage/subject/{id}/textbook(id=${subject.id})}"
+              method="post" class="textbook-form">
+            <label for="tb-title" th:text="#{textbook.title}">Title</label>
+            <input id="tb-title" name="title" required th:value="${subject.textbook?.title}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.title)} ? 'missing'">
+            <label for="tb-authors" th:text="#{textbook.authors}">Authors</label>
+            <input id="tb-authors" name="authors" th:value="${subject.textbook?.authors}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.authors)} ? 'missing'">
+            <label for="tb-publisher" th:text="#{textbook.publisher}">Publisher</label>
+            <input id="tb-publisher" name="publisher" th:value="${subject.textbook?.publisher}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.publisher)} ? 'missing'">
+            <label for="tb-year" th:text="#{textbook.year}">Year</label>
+            <input id="tb-year" name="publicationYear" type="number" th:value="${subject.textbook?.publicationYear}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.publicationYear)} ? 'missing'">
+            <label for="tb-isbn" th:text="#{textbook.isbn}">ISBN</label>
+            <input id="tb-isbn" name="isbn" th:value="${subject.textbook?.isbn}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.isbn)} ? 'missing'">
+            <label for="tb-site" th:text="#{textbook.site}">Publisher website</label>
+            <input id="tb-site" name="publisherUrl" th:value="${subject.textbook?.publisherUrl}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.publisherUrl)} ? 'missing'">
+            <label for="tb-file" th:text="#{textbook.file}">File link</label>
+            <input id="tb-file" name="fileUrl" th:value="${subject.textbook?.fileUrl}"
+                   th:classappend="${#strings.isEmpty(subject.textbook?.fileUrl)} ? 'missing'">
+            <button type="submit" class="btn-save" th:text="#{textbook.save}">Save textbook</button>
+        </form>
+        <dl class="textbook" th:if="${!canEdit and subject.textbook != null}">
             <dt th:text="#{textbook.title}">Title</dt>
             <dd th:text="${subject.textbook.title}"></dd>
             <dt th:text="#{textbook.authors}">Authors</dt>

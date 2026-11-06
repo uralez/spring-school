@@ -23,3 +23,5 @@
       file: db/changelog/changes/011_create_app_user.sql
   - include:
       file: db/changelog/changes/012_create_students_and_grades.sql
+  - include:
+      file: db/changelog/changes/013_create_teacher.sql
