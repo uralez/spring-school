@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{calendar.title}">School calendar</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <h1 th:text="#{calendar.title}">School calendar</h1>
+    <p class="year" th:text="#{calendar.year(${#strings.toString(year)}, ${#strings.toString(year + 1)})}">Academic year</p>
+    <p>
+        <a th:href="@{/calendar(year=${year - 1})}" th:text="'‹ ' + #{calendar.prev}">Previous</a>
+        &nbsp;&nbsp;
+        <a th:href="@{/calendar(year=${year + 1})}" th:text="#{calendar.next} + ' ›'">Next</a>
+    </p>
+    <div class="cal-legend">
+        <span class="cal-working" th:text="#{calendar.legend.working}"></span>
+        <span class="cal-weekend" th:text="#{calendar.legend.weekend}"></span>
+        <span class="cal-holiday" th:text="#{calendar.legend.holiday}"></span>
+        <span class="cal-vacation" th:text="#{calendar.legend.vacation}"></span>
+        <span class="cal-none" th:text="#{calendar.legend.none}"></span>
+    </div>
+    <div class="cal-grid">
+        <div class="cal-month" th:each="m : ${months}">
+            <h2 th:text="${#temporals.format(m.month().atDay(1), 'LLLL yyyy', enLocale)}"></h2>
+            <table>
+                <thead>
+                <tr><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="week : ${m.weeks()}">
+                    <td th:each="c : ${week}"
+                        th:class="${c.type() != null} ? ${'cal-' + c.type()} : 'cal-blank'"
+                        th:classappend="${c.date() != null and c.date() == today} ? 'cal-today'"
+                        th:text="${c.date() != null} ? ${c.date().dayOfMonth} : ''"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

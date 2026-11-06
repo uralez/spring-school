@@ -23,4 +23,6 @@ public interface CalendarDayRepository extends JpaRepository<CalendarDay, LocalD
     long countWorkingWeeks();
 
     List<CalendarDay> findByDayTypeOrderByCalendarDate(String dayType);
+
+    List<CalendarDay> findByCalendarDateBetween(LocalDate from, LocalDate to);
 }
