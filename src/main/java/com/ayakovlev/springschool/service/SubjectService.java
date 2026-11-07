@@ -2,10 +2,7 @@ package com.ayakovlev.springschool.service;
 
 import com.ayakovlev.springschool.dto.PlanItem;
 import com.ayakovlev.springschool.entity.*;
-import com.ayakovlev.springschool.repository.AcademicModuleRepository;
-import com.ayakovlev.springschool.repository.CourseLessonRepository;
-import com.ayakovlev.springschool.repository.SubjectRepository;
-import com.ayakovlev.springschool.repository.TextbookRepository;
+import com.ayakovlev.springschool.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -27,6 +24,7 @@ public class SubjectService {
     private final CourseLessonRepository courseLessonRepository;
     private final AcademicModuleRepository academicModuleRepository;
     private final TextbookRepository textbookRepository;
+    private final StudentGradeRepository studentGradeRepository;
 
     @Transactional(readOnly = true)
     public Optional<Subject> find(String name, String className, LocalDate today) {
@@ -179,4 +177,90 @@ public class SubjectService {
         subject.setApprovedBy(approvedBy == null || approvedBy.isBlank() ? null : approvedBy.trim());
         subject.setApprovedOn(approvedOn);
     }
+
+    public record SwapRules(Set<Long> up, Set<Long> down) {
+    }
+
+    @Transactional(readOnly = true)
+    public SwapRules swapRules(Long subjectId) {
+        List<CourseLesson> list = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId);
+        Set<Long> graded = studentGradeRepository.gradedLessonIds(subjectId);
+        Set<Long> up = new HashSet<>();
+        Set<Long> down = new HashSet<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (graded.contains(list.get(i).getId())) {
+                continue;
+            }
+            if (i > 0 && !graded.contains(list.get(i - 1).getId())) {
+                up.add(list.get(i).getId());
+            }
+            if (i < list.size() - 1 && !graded.contains(list.get(i + 1).getId())) {
+                down.add(list.get(i).getId());
+            }
+        }
+        return new SwapRules(up, down);
+    }
+
+    @Transactional
+    public void swapWithNeighbor(Long subjectId, Long lessonId, int delta) {
+        CourseLesson a = courseLessonRepository.findById(lessonId).orElseThrow();
+        if (!a.getSubject().getId().equals(subjectId) || Math.abs(delta) != 1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        CourseLesson b = courseLessonRepository.findBySubjectIdAndLessonNumber(
+                subjectId, a.getLessonNumber() + delta).orElseThrow();
+        Set<Long> graded = studentGradeRepository.gradedLessonIds(subjectId);
+        if (graded.contains(a.getId()) || graded.contains(b.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
+        String type = a.getLessonType();
+        String topic = a.getTopic();
+        String comment = a.getComment();
+        String lecture = a.getLecture();
+        String cs = a.getClassworkStart();
+        String cj = a.getClassworkJoint();
+        String ce = a.getClassworkEnd();
+        String hw = a.getHomework();
+
+        a.setLessonType(b.getLessonType());
+        a.setTopic(b.getTopic());
+        a.setComment(b.getComment());
+        a.setLecture(b.getLecture());
+        a.setClassworkStart(b.getClassworkStart());
+        a.setClassworkJoint(b.getClassworkJoint());
+        a.setClassworkEnd(b.getClassworkEnd());
+        a.setHomework(b.getHomework());
+
+        b.setLessonType(type);
+        b.setTopic(topic);
+        b.setComment(comment);
+        b.setLecture(lecture);
+        b.setClassworkStart(cs);
+        b.setClassworkJoint(cj);
+        b.setClassworkEnd(ce);
+        b.setHomework(hw);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseLesson> undated(Long subjectId) {
+        return courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+                .filter(l -> l.getPlannedDate() == null).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public long gradeCount(Long lessonId) {
+        return studentGradeRepository.countByCourseLessonId(lessonId);
+    }
+
+    @Transactional
+    public Long deleteLesson(Long lessonId) {
+        CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        Long subjectId = lesson.getSubject().getId();
+        courseLessonRepository.delete(lesson);
+        courseLessonRepository.flush();
+        courseLessonRepository.renumberStep1(subjectId);
+        courseLessonRepository.renumberStep2(subjectId);
+        return subjectId;
+    }
+
 }

@@ -195,3 +195,13 @@ td.time { background: var(--green-light); color: var(--green-dark); font-weight:
 
 .approval { margin: 16px 0; font-weight: 700; color: var(--green-dark); }
 .approval a { text-decoration: none; margin-left: 8px; }
+
+style.css: .reflow-form { margin: 0 0 16px; }
+
+.swap-buttons { display: inline-flex; gap: 4px; margin-left: 10px; vertical-align: middle; }
+.swap-buttons form { display: inline; margin: 0; }
+.swap-buttons button { border: 1px solid var(--green); background: #fff; color: var(--green-dark); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; }
+.swap-buttons button:hover { background: var(--green-light); }
+
+.undated { background: #ffd6d6; border: 2px solid #b3261e; border-radius: 12px; padding: 4px 16px 8px; margin: 16px 0; }
+.undated-title { color: #b3261e; font-weight: 800; }

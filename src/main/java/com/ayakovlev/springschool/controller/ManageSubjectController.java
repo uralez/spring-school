@@ -1,6 +1,7 @@
 package com.ayakovlev.springschool.controller;
 
 import com.ayakovlev.springschool.entity.Subject;
+import com.ayakovlev.springschool.service.ReflowService;
 import com.ayakovlev.springschool.service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 public class ManageSubjectController {
 
     private final SubjectService subjectService;
+    private final ReflowService reflowService;
 
     @PostMapping("/{id}/textbook")
     @PreAuthorize("@access.canEditSubject(authentication, #id)")
@@ -41,6 +43,31 @@ public class ManageSubjectController {
                           @RequestParam String approvedBy,
                           @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate approvedOn) {
         subjectService.approve(id, approvedBy, approvedOn);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
+    }
+
+    @PostMapping("/{id}/reflow")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String reflow(@PathVariable Long id) {
+        reflowService.reflow(id);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
+    }
+
+    @PostMapping("/{id}/lessons/{lessonId}/swap")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String swap(@PathVariable Long id, @PathVariable Long lessonId, @RequestParam int delta) {
+        subjectService.swapWithNeighbor(id, lessonId, delta);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName()
+                + "#lesson-" + lessonId;
+    }
+
+    @PostMapping("/{id}/lessons/{lessonId}/delete")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String deleteLesson(@PathVariable Long id, @PathVariable Long lessonId) {
+        subjectService.deleteLesson(lessonId);
         Subject subject = subjectService.subject(id);
         return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
     }

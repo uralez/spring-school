@@ -17,6 +17,10 @@
     <th:block th:if="${subject != null}"
               th:with="yearLabel=${subject.academicYear + '–' + #numbers.formatInteger((subject.academicYear + 1) % 100, 2)}">
         <p class="year" th:text="#{subject.year(${yearLabel})}">Academic year</p>
+        <form th:if="${canEdit and needsReflow}" th:action="@{/manage/subject/{id}/reflow(id=${subject.id})}" method="post"
+              class="reflow-form" onsubmit="return confirm('Recalculate the dates of the lessons that have not been held yet?');">
+            <button type="submit" class="btn-fill" th:text="#{plan.reflow}">Reflow dates</button>
+        </form>
 
         <form th:if="${canEdit}" th:action="@{/manage/subject/{id}/textbook(id=${subject.id})}"
               method="post" class="textbook-form">
@@ -79,7 +83,7 @@
                             th:text="#{plan.vacation(${#temporals.format(item.from(), 'd MMM', enLocale)}, ${#temporals.format(item.to(), 'd MMM', enLocale)})}"></td>
                     </tr>
                     <th:block th:if="${item.kind() == 'week'}">
-                        <tr th:each="l, st : ${item.lessons()}"
+                        <tr th:each="l, st : ${item.lessons()}" th:id="${'lesson-' + l.id}"
                             th:classappend="${'m' + l.plannedDate.monthValue + (l.lessonType != 'lesson' ? ' row-' + l.lessonType : '') + (l.id == currentId ? ' current' : '')}">
                             <td th:if="${st.first}" th:rowspan="${st.size}" class="week-cell"
                                 th:classappend="${'m' + l.plannedDate.monthValue}">
@@ -87,13 +91,44 @@
                             </td>
                             <td th:text="${l.lessonNumber}"></td>
                             <td th:text="${#temporals.format(l.plannedDate, 'd MMM, EEE', enLocale)}"></td>
-                            <td><a th:href="@{/lesson/{id}(id=${l.id})}" th:text="${l.topic}"></a></td>
+                            <td>
+                                <a th:href="@{/lesson/{id}(id=${l.id})}" th:text="${l.topic != null} ? ${l.topic} : #{plan.notopic}"></a>
+                                <span class="swap-buttons" th:if="${canEdit}">
+                                    <form th:if="${swapRules.up().contains(l.id)}" method="post"
+                                          th:action="@{/manage/subject/{sid}/lessons/{lid}/swap(sid=${subject.id},lid=${l.id})}">
+                                        <input type="hidden" name="delta" value="-1">
+                                        <button type="submit" th:title="#{plan.moveup}">▲</button>
+                                    </form>
+                                    <form th:if="${swapRules.down().contains(l.id)}" method="post"
+                                          th:action="@{/manage/subject/{sid}/lessons/{lid}/swap(sid=${subject.id},lid=${l.id})}">
+                                        <input type="hidden" name="delta" value="1">
+                                        <button type="submit" th:title="#{plan.movedown}">▼</button>
+                                    </form>
+                                </span>
+                            </td>
                         </tr>
                     </th:block>
                 </th:block>
                 </tbody>
             </table>
         </div>
+
+        <div class="undated" th:if="${!undated.isEmpty()}">
+            <p class="undated-title" th:text="#{plan.undated}"></p>
+            <ul>
+                <li th:each="l : ${undated}">
+                    <span th:text="${l.lessonNumber}"></span>.
+                    <a th:href="@{/lesson/{id}(id=${l.id})}"
+                       th:text="${l.topic != null} ? ${l.topic} : #{plan.notopic}"></a>
+                    <form th:if="${canEdit}" method="post" class="add-lesson-form"
+                          th:action="@{/manage/subject/{sid}/lessons/{lid}/delete(sid=${subject.id},lid=${l.id})}"
+                          th:attr="data-confirm=#{plan.delete.confirm}">
+                        <button type="submit" class="btn-add-lesson" th:text="#{plan.delete}">Delete</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
         <p class="approval">
             <span th:if="${subject.approvedBy != null}"
                   th:text="#{approval.done(${subject.approvedBy}, ${#temporals.format(subject.approvedOn, 'dd.MM.yyyy')})}"></span>
@@ -126,8 +161,17 @@
     </th:block>
 </div>
 <script>
-    var current = document.querySelector('tr.current');
-    if (current) { current.scrollIntoView({block: 'center'}); }
+    // scroll page to the current lesson
+    var target = location.hash ? document.querySelector(location.hash) : document.querySelector('tr.current');
+    if (target) { target.scrollIntoView({block: 'center'}); }
+</script>
+<script>
+    // confirm to delete lesson
+    document.querySelectorAll('form[data-confirm]').forEach(function (f) {
+        f.addEventListener('submit', function (e) {
+            if (!confirm(f.dataset.confirm)) { e.preventDefault(); }
+        });
+    });
 </script>
 </body>
 </html>

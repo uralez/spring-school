@@ -1,6 +1,7 @@
 package com.ayakovlev.springschool.controller;
 
 import com.ayakovlev.springschool.entity.CourseLesson;
+import com.ayakovlev.springschool.service.AccessService;
 import com.ayakovlev.springschool.service.GradeService;
 import com.ayakovlev.springschool.service.MarkdownService;
 import com.ayakovlev.springschool.service.SubjectService;
@@ -20,6 +21,7 @@ public class LessonController {
     private final SubjectService subjectService;
     private final MarkdownService markdownService;
     private final GradeService gradeService;
+    private final AccessService access;
 
     @GetMapping("/lesson/{id}")
     public String lesson(@PathVariable Long id, Model model, Authentication authentication) {
@@ -38,6 +40,9 @@ public class LessonController {
         model.addAttribute("homeworkDue", subjectService.nextLessonDate(lesson));
         model.addAttribute("prevLesson", subjectService.neighbor(lesson, -1).orElse(null));
         model.addAttribute("nextLesson", subjectService.neighbor(lesson, 1).orElse(null));
+
+        model.addAttribute("gradeCount", subjectService.gradeCount(lesson.getId()));
+        model.addAttribute("canEditLesson", access.canEditSubject(authentication, lesson.getSubject().getId()));
 
         if (Boolean.TRUE.equals(model.getAttribute("isAdmin"))) {
             model.addAttribute("students", gradeService.studentsFor(lesson));

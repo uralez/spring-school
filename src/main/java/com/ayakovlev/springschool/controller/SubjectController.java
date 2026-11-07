@@ -2,6 +2,7 @@ package com.ayakovlev.springschool.controller;
 
 import com.ayakovlev.springschool.entity.Subject;
 import com.ayakovlev.springschool.service.AccessService;
+import com.ayakovlev.springschool.service.ReflowService;
 import com.ayakovlev.springschool.service.SubjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,7 @@ public class SubjectController {
 
     private final SubjectService subjectService;
     private final AccessService access;
+    private final ReflowService reflowService;
 
     @GetMapping("/subject/{name}/{className}")
     public String subject(@PathVariable String name, @PathVariable String className, Model model, Authentication authentication) {
@@ -32,6 +34,9 @@ public class SubjectController {
             model.addAttribute("enLocale", java.util.Locale.ENGLISH);
             model.addAttribute("canEdit", access.canEditSubject(authentication, subject.get().getId()));
             model.addAttribute("canApprove", access.canApprove(authentication));
+            model.addAttribute("swapRules", subjectService.swapRules(subject.get().getId()));
+            model.addAttribute("needsReflow", reflowService.needsReflow(subject.get().getId()));
+            model.addAttribute("undated", subjectService.undated(subject.get().getId()));
         }
         return "subject";
     }
