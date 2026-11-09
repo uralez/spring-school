@@ -40,3 +40,4 @@ application-local.properties
 *.log
 
 .env
+*.tar
