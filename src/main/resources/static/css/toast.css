@@ -1,0 +1,10 @@
+.toast { position: fixed; top: 16px; right: 16px; z-index: 1000; max-width: 380px; padding: 12px 18px; border-radius: 10px; color: #fff; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25); }
+.toast-success { background: #2f8f3a; }
+.toast-dialog { border: 3px solid; border-radius: 14px; padding: 18px 22px; max-width: 460px; }
+.toast-dialog.toast-warning { border-color: #e0a800; }
+.toast-dialog.toast-error { border-color: #b3261e; }
+.toast-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.toast-dialog h2 { margin-top: 0; }
+.toast-dialog.toast-warning h2 { color: #8a6500; }
+.toast-dialog.toast-error h2 { color: #b3261e; }
+.toast-dialog button { margin-top: 12px; padding: 8px 24px; border: 0; border-radius: 8px; background: var(--green-dark); color: #fff; font: inherit; font-weight: 800; cursor: pointer; }

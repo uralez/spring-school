@@ -25,6 +25,7 @@ public class SubjectService {
     private final AcademicModuleRepository academicModuleRepository;
     private final TextbookRepository textbookRepository;
     private final StudentGradeRepository studentGradeRepository;
+    private final TopicListParser topicListParser;
 
     @Transactional(readOnly = true)
     public Optional<Subject> find(String name, String className, LocalDate today) {
@@ -263,4 +264,37 @@ public class SubjectService {
         return subjectId;
     }
 
+    public record ImportResult(int assigned, List<String> extra) {
+    }
+
+    @Transactional
+    public ImportResult importTopics(Long subjectId, String text) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow();
+        List<String> topics = topicListParser.parse(text);
+        List<CourseLesson> empty = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+                .filter(l -> "lesson".equals(l.getLessonType()))
+                .filter(l -> l.getTopic() == null || l.getTopic().isBlank())
+                .toList();
+        int n = Math.min(topics.size(), empty.size());
+        for (int i = 0; i < n; i++) {
+            empty.get(i).setTopic(topics.get(i));
+        }
+        List<String> extra = new ArrayList<>(topics.subList(n, topics.size()));
+        List<CourseLesson> created = new ArrayList<>();
+        int temp = 900000;
+        for (String topic : extra) {
+            CourseLesson l = new CourseLesson();
+            l.setSubject(subject);
+            l.setLessonType("lesson");
+            l.setTopic(topic);
+            l.setLessonNumber(++temp);
+            created.add(l);
+        }
+        courseLessonRepository.saveAll(created);
+        if (!created.isEmpty()) {
+            courseLessonRepository.renumberStep1(subjectId);
+            courseLessonRepository.renumberStep2(subjectId);
+        }
+        return new ImportResult(n, extra);
+    }
 }

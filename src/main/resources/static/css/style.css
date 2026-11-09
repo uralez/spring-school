@@ -205,3 +205,6 @@ style.css: .reflow-form { margin: 0 0 16px; }
 
 .undated { background: #ffd6d6; border: 2px solid #b3261e; border-radius: 12px; padding: 4px 16px 8px; margin: 16px 0; }
 .undated-title { color: #b3261e; font-weight: 800; }
+
+.import-box { background: #fff; border: 2px solid var(--green-light); border-radius: 12px; padding: 8px 14px; margin: 0 0 16px; }
+.import-box summary { cursor: pointer; font-weight: 700; color: var(--green-dark); }

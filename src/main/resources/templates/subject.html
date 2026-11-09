@@ -22,6 +22,17 @@
             <button type="submit" class="btn-fill" th:text="#{plan.reflow}">Reflow dates</button>
         </form>
 
+        <details class="import-box" th:if="${canEdit}">
+            <summary th:text="#{import.title}">Import topics</summary>
+            <form method="post" th:action="@{/manage/subject/{id}/topics(id=${subject.id})}" class="lesson-form">
+                <p class="form-hint" th:text="#{import.hint}"></p>
+                <textarea name="topics" rows="12" required></textarea>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save" th:text="#{import.submit}">Distribute topics</button>
+                </div>
+            </form>
+        </details>
+
         <form th:if="${canEdit}" th:action="@{/manage/subject/{id}/textbook(id=${subject.id})}"
               method="post" class="textbook-form">
             <label for="tb-title" th:text="#{textbook.title}">Title</label>

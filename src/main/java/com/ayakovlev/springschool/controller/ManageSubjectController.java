@@ -4,6 +4,7 @@ import com.ayakovlev.springschool.entity.Subject;
 import com.ayakovlev.springschool.service.ReflowService;
 import com.ayakovlev.springschool.service.SubjectService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -11,8 +12,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class ManageSubjectController {
 
     private final SubjectService subjectService;
     private final ReflowService reflowService;
+    private final MessageSource messageSource;
 
     @PostMapping("/{id}/textbook")
     @PreAuthorize("@access.canEditSubject(authentication, #id)")
@@ -68,6 +72,27 @@ public class ManageSubjectController {
     @PreAuthorize("@access.canEditSubject(authentication, #id)")
     public String deleteLesson(@PathVariable Long id, @PathVariable Long lessonId) {
         subjectService.deleteLesson(lessonId);
+        Subject subject = subjectService.subject(id);
+        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
+    }
+
+    @PostMapping("/{id}/topics")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String importTopics(@PathVariable Long id, @RequestParam String topics,
+                               RedirectAttributes redirect, Locale locale) {
+        SubjectService.ImportResult result = subjectService.importTopics(id, topics);
+        if (result.assigned() == 0 && result.extra().isEmpty()) {
+            redirect.addFlashAttribute("flashKind", "error");
+            redirect.addFlashAttribute("flashText", messageSource.getMessage("import.empty", null, locale));
+        } else if (!result.extra().isEmpty()) {
+            redirect.addFlashAttribute("flashKind", "warning");
+            redirect.addFlashAttribute("flashText",
+                    messageSource.getMessage("import.extra", new Object[]{result.extra().size()}, locale));
+        } else {
+            redirect.addFlashAttribute("flashKind", "success");
+            redirect.addFlashAttribute("flashText",
+                    messageSource.getMessage("import.done", new Object[]{result.assigned()}, locale));
+        }
         Subject subject = subjectService.subject(id);
         return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
     }

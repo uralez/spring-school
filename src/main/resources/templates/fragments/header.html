@@ -26,6 +26,12 @@
             </th:block>
         </div>
     </div>
+
+    <div id="flash" hidden
+         th:attr="data-kind=${flashKind}, data-text=${flashText}, data-title-error=#{toast.title.error}, data-title-warning=#{toast.title.warning}"></div>
+    <link rel="stylesheet" th:href="@{/css/toast.css}">
+    <script th:src="@{/js/toast.js}" defer></script>
+
 </header>
 </body>
 </html>
