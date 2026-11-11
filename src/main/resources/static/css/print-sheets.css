@@ -1,0 +1,23 @@
+@page { size: A4; margin: 8mm; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #000; background: #fff; }
+.screen-only { padding: 10px; background: #eee; }
+.sheet { width: 194mm; height: 281mm; margin: 0 auto; display: flex; flex-direction: column; page-break-after: always; break-after: page; overflow: hidden; }
+.sheet:last-of-type { page-break-after: auto; break-after: auto; }
+.half { height: 50%; border-bottom: 1px dashed #888; display: flex; }
+.half:last-child { border-bottom: 0; }
+.works .part { width: 50%; }
+.works .part:first-child { border-right: 1px dashed #888; }
+.homework .part { width: 100%; }
+.part { padding: 3mm 4mm; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.head { font-size: 9pt; color: #333; }
+.topic { font-weight: bold; font-size: 13pt; margin: 1mm 0; }
+.student { font-size: 10pt; margin: 1mm 0; }
+.line { display: inline-block; min-width: 55mm; border-bottom: 1px solid #000; min-height: 1em; padding: 0 2mm; }
+.kind { font-weight: bold; font-size: 11pt; margin: 1mm 0; text-transform: uppercase; letter-spacing: 0.5px; }
+.body { flex: 1 1 auto; overflow: hidden; font-size: 11pt; line-height: 1.25; }
+.body p { margin: 0 0 1.5mm; }
+.body ul, .body ol { margin: 0 0 1.5mm; padding-left: 5mm; }
+.body blockquote { margin: 0; padding: 0; border: 0; color: inherit; font-size: inherit; }
+@media screen { body { background: #ccc; } .sheet { background: #fff; margin: 8mm auto; box-shadow: 0 0 6px rgba(0,0,0,.4); } }
+@media print { .screen-only { display: none; } }

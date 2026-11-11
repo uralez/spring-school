@@ -48,6 +48,9 @@ public class LessonController {
             model.addAttribute("students", gradeService.studentsFor(lesson));
             model.addAttribute("grades", gradeService.gradesFor(lesson.getId()));
         }
+        if (Boolean.TRUE.equals(model.getAttribute("canEditLesson"))) {
+            model.addAttribute("printStudents", gradeService.studentsFor(lesson));
+        }
 
         return "lesson";
     }

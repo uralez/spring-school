@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Print sheets</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+    <link rel="stylesheet" th:href="@{/css/print-sheets.css}">
+</head>
+<body>
+<div class="screen-only">
+    <button type="button" onclick="window.print()">Print / Save as PDF</button>
+    <span th:text="${names.size()} + ' sheet(s)'"></span>
+</div>
+
+<div class="sheet" th:each="name : ${names}">
+    <div class="half homework">
+        <div class="part">
+            <div class="head">
+                <span th:text="${place}"></span> &mdash; <span th:text="${subject + '-' + className}"></span>
+                &mdash; <span th:text="${date}"></span>
+            </div>
+            <div class="topic fit" th:text="${topic}"></div>
+            <div class="student">Student's name <span class="line" th:text="${name}"></span></div>
+            <div class="kind">Homework</div>
+            <div class="body fit-body md" th:utext="${homeworkHtml}"></div>
+        </div>
+    </div>
+    <div class="half works">
+        <div class="part">
+            <div class="head">
+                <span th:text="${place}"></span> &mdash; <span th:text="${subject + '-' + className}"></span>
+                &mdash; <span th:text="${date}"></span>
+            </div>
+            <div class="topic fit" th:text="${topic}"></div>
+            <div class="student">Student's name <span class="line" th:text="${name}"></span></div>
+            <div class="kind">Independent work: start</div>
+            <div class="body fit-body md" th:utext="${startHtml}"></div>
+        </div>
+        <div class="part">
+            <div class="head">
+                <span th:text="${place}"></span> &mdash; <span th:text="${subject + '-' + className}"></span>
+                &mdash; <span th:text="${date}"></span>
+            </div>
+            <div class="topic fit" th:text="${topic}"></div>
+            <div class="student">Student's name <span class="line" th:text="${name}"></span></div>
+            <div class="kind">Independent work: finish</div>
+            <div class="body fit-body md" th:utext="${endHtml}"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script th:src="@{/js/print-sheets.js}"></script>
+</body>
+</html>

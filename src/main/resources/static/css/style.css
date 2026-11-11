@@ -208,3 +208,8 @@ style.css: .reflow-form { margin: 0 0 16px; }
 
 .import-box { background: #fff; border: 2px solid var(--green-light); border-radius: 12px; padding: 8px 14px; margin: 0 0 16px; }
 .import-box summary { cursor: pointer; font-weight: 700; color: var(--green-dark); }
+
+.print-students { display: flex; flex-direction: column; gap: 4px; max-height: 220px; overflow-y: auto; border: 2px solid var(--green-light); border-radius: 10px; padding: 8px 12px; }
+.print-check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--text); }
+.print-check input[type=checkbox] { width: auto; }
+.print-check input[type=number] { width: 70px; }

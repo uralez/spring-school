@@ -1,5 +1,6 @@
 package com.ayakovlev.springschool.service;
 
+import com.ayakovlev.springschool.repository.CourseLessonRepository;
 import com.ayakovlev.springschool.repository.SubjectRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -16,6 +17,7 @@ public class AccessService {
     private static final Set<String> APPROVE = Set.of("ADMIN", "DIRECTOR", "DEPUTY", "METHODIST");
 
     private final SubjectRepository subjectRepository;
+    private final CourseLessonRepository courseLessonRepository;
 
     public boolean hasRole(Authentication authentication, String role) {
         return authentication != null && authentication.getAuthorities().stream()
@@ -51,5 +53,12 @@ public class AccessService {
     public boolean canApprove(Authentication authentication) {
         return authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(a -> APPROVE.contains(a.getAuthority().replace("ROLE_", "")));
+    }
+
+    @Transactional(readOnly = true)
+    public boolean canEditLesson(Authentication authentication, Long lessonId) {
+        return courseLessonRepository.findById(lessonId)
+                .map(l -> canEditSubject(authentication, l.getSubject().getId()))
+                .orElse(false);
     }
 }

@@ -36,6 +36,66 @@
         });
     </script>
 
+    <p class="no-print" th:if="${canEditLesson}">
+        <button type="button" id="open-print" class="btn-fill" th:text="#{print.open}">Print sheets</button>
+    </p>
+    <dialog id="print-dialog" class="prompt-dialog" th:if="${canEditLesson}"
+            th:attr="data-subject=${subject.name}, data-class=${subject.classes.isEmpty() ? '' : subject.classes.![className].stream().sorted().findFirst().orElse('')}, data-date=${lesson.plannedDate != null ? #temporals.format(lesson.plannedDate, 'd MMM', enLocale) + '''' + #temporals.format(lesson.plannedDate, 'yy') : ''}, data-topic=${lesson.topic}">
+        <h2 th:text="#{print.title}">Print sheets for students</h2>
+        <form id="print-form" method="get" target="_blank"
+              th:action="@{/manage/lesson/{id}/print(id=${lesson.id})}" class="lesson-form">
+            <label for="pr-place" th:text="#{print.place}">Place</label>
+            <input id="pr-place" name="place" value="spring-school">
+            <label for="pr-subject" th:text="#{print.subject}">Subject</label>
+            <input id="pr-subject" name="subject">
+            <label for="pr-class" th:text="#{print.class}">Class</label>
+            <input id="pr-class" name="className">
+            <label for="pr-date" th:text="#{print.date}">Date</label>
+            <input id="pr-date" name="date">
+            <label for="pr-topic" th:text="#{print.topic}">Lesson topic</label>
+            <input id="pr-topic" name="topic">
+            <label th:text="#{print.students}">Students</label>
+            <div class="print-students">
+                <label th:each="s : ${printStudents}" class="print-check">
+                    <input type="checkbox" name="studentIds" th:value="${s.id}" checked>
+                    <span th:text="${s.user.fullName}"></span>
+                </label>
+                <label class="print-check">
+                    <input type="checkbox" id="pr-blank">
+                    <span th:text="#{print.blank}">Blank name</span>
+                    <input type="number" id="pr-blank-count" min="1" max="50" value="1" disabled>
+                </label>
+                <input type="hidden" name="blanks" id="pr-blanks" value="0">
+            </div>
+            <div class="form-buttons">
+                <button type="submit" class="btn-save" th:text="#{print.go}">Open sheets</button>
+                <button type="button" id="close-print" th:text="#{print.cancel}">Cancel</button>
+            </div>
+        </form>
+    </dialog>
+    <script th:if="${canEditLesson}">
+        (function () {
+            var dialog = document.getElementById('print-dialog');
+            var form = document.getElementById('print-form');
+            var blank = document.getElementById('pr-blank');
+            var count = document.getElementById('pr-blank-count');
+            var blanks = document.getElementById('pr-blanks');
+            document.getElementById('open-print').addEventListener('click', function () {
+                document.getElementById('pr-subject').value = dialog.dataset.subject || '';
+                document.getElementById('pr-class').value = dialog.dataset.class || '';
+                document.getElementById('pr-date').value = dialog.dataset.date || '';
+                document.getElementById('pr-topic').value = dialog.dataset.topic || '';
+                dialog.showModal();
+            });
+            document.getElementById('close-print').addEventListener('click', function () { dialog.close(); });
+            blank.addEventListener('change', function () { count.disabled = !blank.checked; });
+            form.addEventListener('submit', function () {
+                blanks.value = blank.checked ? count.value : 0;
+                dialog.close();
+            });
+        })();
+    </script>
+
     <p class="no-print">
         <button type="button" class="btn-print" onclick="window.print()" th:text="#{lesson.print}">Print</button>
     </p>
