@@ -31,3 +31,5 @@
       file: db/changelog/changes/015_fix_april_holidays.sql
   - include:
       file: db/changelog/changes/016_create_lesson_slot.sql
+  - include:
+      file: db/changelog/changes/017_add_grade_kind.sql

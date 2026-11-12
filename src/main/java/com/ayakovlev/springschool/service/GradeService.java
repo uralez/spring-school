@@ -49,6 +49,7 @@ public class GradeService {
         grade.setStudent(student);
         grade.setCourseLesson(lesson);
         grade.setScore(score);
+        grade.setKind(kind == null || kind.isBlank() ? null : kind);
         grade.setComment(buildComment(lesson.getSubject().getLanguage(), kind, comment));
         studentGradeRepository.save(grade);
     }
@@ -84,5 +85,23 @@ public class GradeService {
         Map<String, String> cells = new HashMap<>();
         byCell.forEach((k, v) -> cells.put(k, v.stream().map(String::valueOf).collect(Collectors.joining(", "))));
         return new Gradebook(subject, lessons, students, cells, graded);
+    }
+
+    @Transactional
+    public Long updateGrade(Long gradeId, Long studentId, String kind, int score, String comment) {
+        StudentGrade grade = studentGradeRepository.findById(gradeId).orElseThrow();
+        grade.setStudent(studentRepository.findById(studentId).orElseThrow());
+        grade.setKind(kind == null || kind.isBlank() ? null : kind);
+        grade.setScore(score);
+        grade.setComment(comment == null || comment.isBlank() ? null : comment.trim());
+        return grade.getCourseLesson().getId();
+    }
+
+    @Transactional
+    public Long deleteGrade(Long gradeId) {
+        StudentGrade grade = studentGradeRepository.findById(gradeId).orElseThrow();
+        Long lessonId = grade.getCourseLesson().getId();
+        studentGradeRepository.delete(grade);
+        return lessonId;
     }
 }

@@ -20,4 +20,5 @@ public class StudentGrade extends BaseEntity {
 
     private Integer score;
     private String comment;
+    private String kind;
 }
