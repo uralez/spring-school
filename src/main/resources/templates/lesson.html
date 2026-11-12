@@ -24,9 +24,9 @@
     </p>
 
     <form th:if="${canEditLesson}" method="post" class="no-print delete-lesson"
-          th:action="@{/manage/subject/{sid}/lessons/{lid}/delete(sid=${subject.id},lid=${lesson.id})}"
-          th:attr="data-confirm=#{lesson.delete.confirm(${gradeCount})}">
-        <button type="submit" class="btn-add-lesson" th:text="#{lesson.delete}">Delete lesson</button>
+          th:action="@{/manage/subject/{sid}/lessons/{lid}/clear(sid=${subject.id},lid=${lesson.id})}"
+          th:attr="data-confirm=#{lesson.clear.confirm}">
+        <button type="submit" class="btn-add-lesson" th:text="#{lesson.clear}">Clear lesson</button>
     </form>
     <script>
         document.querySelectorAll('form[data-confirm]').forEach(function (f) {

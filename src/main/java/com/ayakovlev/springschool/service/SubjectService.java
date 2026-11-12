@@ -256,6 +256,9 @@ public class SubjectService {
     @Transactional
     public Long deleteLesson(Long lessonId) {
         CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        if (lesson.getPlannedDate() != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT);
+        }
         Long subjectId = lesson.getSubject().getId();
         courseLessonRepository.delete(lesson);
         courseLessonRepository.flush();
@@ -296,5 +299,18 @@ public class SubjectService {
             courseLessonRepository.renumberStep2(subjectId);
         }
         return new ImportResult(n, extra);
+    }
+
+    @Transactional
+    public Long clearLesson(Long lessonId) {
+        CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        lesson.setTopic(null);
+        lesson.setComment(null);
+        lesson.setLecture(null);
+        lesson.setClassworkStart(null);
+        lesson.setClassworkJoint(null);
+        lesson.setClassworkEnd(null);
+        lesson.setHomework(null);
+        return lesson.getSubject().getId();
     }
 }

@@ -96,4 +96,11 @@ public class ManageSubjectController {
         Subject subject = subjectService.subject(id);
         return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
     }
+
+    @PostMapping("/{id}/lessons/{lessonId}/clear")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String clearLesson(@PathVariable Long id, @PathVariable Long lessonId) {
+        subjectService.clearLesson(lessonId);
+        return "redirect:/lesson/" + lessonId;
+    }
 }
