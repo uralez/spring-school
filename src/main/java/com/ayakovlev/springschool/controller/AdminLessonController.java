@@ -75,4 +75,22 @@ public class AdminLessonController {
         return "redirect:/lesson/" + id + "#grades";
     }
 
+    @PostMapping("/grades/{gradeId}")
+    public String updateGrade(@PathVariable Long gradeId,
+                              @RequestParam Long studentId,
+                              @RequestParam(required = false) String kind,
+                              @RequestParam int score,
+                              @RequestParam(required = false) String comment) {
+        if (score < 0 || score > 100) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        Long lessonId = gradeService.updateGrade(gradeId, studentId, kind, score, comment);
+        return "redirect:/lesson/" + lessonId + "#grades";
+    }
+
+    @PostMapping("/grades/{gradeId}/delete")
+    public String deleteGrade(@PathVariable Long gradeId) {
+        Long lessonId = gradeService.deleteGrade(gradeId);
+        return "redirect:/lesson/" + lessonId + "#grades";
+    }
 }

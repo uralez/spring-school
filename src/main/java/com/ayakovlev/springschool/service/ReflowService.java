@@ -76,16 +76,16 @@ public class ReflowService {
             return false;
         }
         if (layout.free().size() != layout.movable().size()) {
-            log.warn("REFLOW: free=" + layout.free().size() + " movable=" + layout.movable().size());
-            System.out.println("REFLOW: free=" + layout.free().size() + " movable=" + layout.movable().size());
+            log.warn("REFLOW: free=" + layout.free().size() + " movable=" + layout.movable().size() + ", subject: " + subject.getName() + "-" + subject.getClasses());
+            //System.out.println("REFLOW: free=" + layout.free().size() + " movable=" + layout.movable().size());
             return true;
         }
         for (int i = 0; i < layout.free().size(); i++) {
             if (!layout.free().get(i).equals(layout.movable().get(i).getPlannedDate())) {
                 log.warn("REFLOW: difference at " + i + ": free=" + layout.free().get(i)
-                        + ", lesson=" + layout.movable().get(i).getPlannedDate());
-                System.out.println("REFLOW: difference at " + i + ": free=" + layout.free().get(i)
-                        + ", lesson=" + layout.movable().get(i).getPlannedDate());
+                        + ", lesson=" + layout.movable().get(i).getPlannedDate() + ", subject: " + subject.getName() + "-" + subject.getClasses());
+//                System.out.println("REFLOW: difference at " + i + ": free=" + layout.free().get(i)
+//                        + ", lesson=" + layout.movable().get(i).getPlannedDate());
                 return true;
             }
         }

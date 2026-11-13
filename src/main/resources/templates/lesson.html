@@ -145,18 +145,33 @@
         <table class="grade-table" th:unless="${grades.isEmpty()}">
             <thead>
             <tr>
-                <th th:text="#{grades.student}">Student</th>
-                <th th:text="#{grades.score}">Score</th>
-                <th th:text="#{grades.comment}">Comment</th>
-                <th th:text="#{grades.when}">Time</th>
+                <th th:text="#{grades.number}">#</th>
+                <th class="sortable" data-type="text" th:text="#{grades.student}">Student</th>
+                <th class="sortable" data-type="text" th:text="#{grades.kind}">Type</th>
+                <th class="sortable" data-type="number" th:text="#{grades.score}">Score</th>
+                <th class="sortable" data-type="text" th:text="#{grades.comment}">Comment</th>
+                <th class="sortable" data-type="number" th:text="#{grades.when}">Time</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="g : ${grades}">
-                <td th:text="${g.student.user.fullName}"></td>
-                <td th:text="${g.score}"></td>
-                <td th:text="${g.comment}"></td>
-                <td th:text="${#temporals.format(g.dcre, 'd MMM HH:mm', enLocale)}"></td>
+            <tr th:each="g, st : ${grades}">
+                <td th:text="${st.count}"></td>
+                <td th:text="${g.student.user.fullName}" th:attr="data-sort=${g.student.user.fullName}"></td>
+                <td th:text="${g.kind != null} ? #{${'gradekind.' + g.kind}} : ''"
+                    th:attr="data-sort=${g.kind != null} ? #{${'gradekind.' + g.kind}} : ''"></td>
+                <td th:text="${g.score}" th:attr="data-sort=${g.score}"></td>
+                <td th:text="${g.comment}" th:attr="data-sort=${g.comment != null} ? ${g.comment} : ''"></td>
+                <td th:text="${#temporals.format(g.dcre, 'd MMM HH:mm', enLocale)}"
+                    th:attr="data-sort=${#temporals.format(g.dcre, 'yyyyMMddHHmmss')}"></td>
+                <td class="grade-actions">
+                    <button type="button" class="grade-edit" th:title="#{grades.edit}"
+                            th:attr="data-id=${g.id}, data-student=${g.student.id}, data-kind=${g.kind}, data-score=${g.score}, data-comment=${g.comment}">✎</button>
+                    <form method="post" th:action="@{/admin/lesson/grades/{gid}/delete(gid=${g.id})}"
+                          th:attr="data-confirm-delete=#{grades.delete.confirm}">
+                        <button type="submit" th:title="#{grades.delete}">✕</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -192,6 +207,37 @@
                 </div>
             </form>
         </dialog>
+
+        <dialog id="grade-edit-dialog" class="prompt-dialog">
+            <h2 th:text="#{grades.edit}">Edit grade</h2>
+            <form id="grade-edit-form" method="post" th:action="@{/admin/lesson/grades/0}"
+                  th:attr="data-base=@{/admin/lesson/grades/}" class="lesson-form">
+                <label for="ge-student" th:text="#{grades.student}">Student</label>
+                <select id="ge-student" name="studentId" class="fancy-select" required>
+                    <option th:each="s : ${students}" th:value="${s.id}" th:text="${s.user.fullName}"></option>
+                </select>
+                <label for="ge-kind" th:text="#{grades.kind}">Type</label>
+                <select id="ge-kind" name="kind" class="fancy-select">
+                    <option value=""></option>
+                    <option value="classwork_start">Independent work (start)</option>
+                    <option value="classwork_end">Independent work (end)</option>
+                    <option value="homework">Homework</option>
+                    <option value="board">Board work</option>
+                    <option value="test">Test</option>
+                    <option value="retake">Retake</option>
+                    <option value="other">Other</option>
+                </select>
+                <label for="ge-score" th:text="#{grades.score}">Score</label>
+                <input id="ge-score" type="number" name="score" min="0" max="100" required>
+                <label for="ge-comment" th:text="#{grades.comment}">Comment</label>
+                <textarea id="ge-comment" name="comment" rows="3"></textarea>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-save" th:text="#{grades.save}">Save</button>
+                    <button type="button" id="close-grade-edit" th:text="#{grades.cancel}">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+
     </section>
 
     <p th:if="${#strings.isEmpty(lectureHtml) and #strings.isEmpty(classworkStartHtml) and #strings.isEmpty(classworkJointHtml) and #strings.isEmpty(classworkEndHtml) and #strings.isEmpty(homeworkHtml)}"
@@ -219,6 +265,52 @@
         if (!open || !dialog) { return; }
         open.addEventListener('click', function () { dialog.showModal(); });
         document.getElementById('close-grade').addEventListener('click', function () { dialog.close(); });
+    })();
+</script>
+<script th:if="${isAdmin}">
+    (function () {
+        var dialog = document.getElementById('grade-edit-dialog');
+        var form = document.getElementById('grade-edit-form');
+        if (!dialog || !form) { return; }
+
+        function sortBy(th) {
+            var idx = Array.prototype.indexOf.call(th.parentNode.children, th);
+            var asc = th.dataset.dir !== 'asc';
+            th.parentNode.querySelectorAll('th').forEach(function (h) { h.removeAttribute('data-dir'); });
+            th.dataset.dir = asc ? 'asc' : 'desc';
+            var tbody = th.closest('table').tBodies[0];
+            var rows = Array.prototype.slice.call(tbody.rows);
+            rows.sort(function (a, b) {
+                var x = a.cells[idx].dataset.sort, y = b.cells[idx].dataset.sort;
+                var r = th.dataset.type === 'number' ? parseFloat(x) - parseFloat(y) : x.localeCompare(y);
+                return asc ? r : -r;
+            });
+            rows.forEach(function (r, i) {
+                tbody.appendChild(r);
+                r.cells[0].textContent = i + 1;
+            });
+        }
+
+        document.addEventListener('click', function (e) {
+            var edit = e.target.closest('.grade-edit');
+            if (edit) {
+                form.action = form.dataset.base + edit.dataset.id;
+                document.getElementById('ge-student').value = edit.dataset.student;
+                document.getElementById('ge-kind').value = edit.dataset.kind || '';
+                document.getElementById('ge-score').value = edit.dataset.score;
+                document.getElementById('ge-comment').value = edit.dataset.comment || '';
+                dialog.showModal();
+                return;
+            }
+            var th = e.target.closest('th.sortable');
+            if (th) { sortBy(th); return; }
+            if (e.target.id === 'close-grade-edit') { dialog.close(); }
+        });
+
+        document.addEventListener('submit', function (e) {
+            var f = e.target;
+            if (f.dataset.confirmDelete && !confirm(f.dataset.confirmDelete)) { e.preventDefault(); }
+        });
     })();
 </script>
 </body>

@@ -213,3 +213,10 @@ style.css: .reflow-form { margin: 0 0 16px; }
 .print-check { display: flex; align-items: center; gap: 8px; font-weight: 400; color: var(--text); }
 .print-check input[type=checkbox] { width: auto; }
 .print-check input[type=number] { width: 70px; }
+
+.grade-table th.sortable { cursor: pointer; }
+.grade-table th.sortable[data-dir="asc"]::after { content: " ▲"; }
+.grade-table th.sortable[data-dir="desc"]::after { content: " ▼"; }
+.grade-actions { white-space: nowrap; }
+.grade-actions form { display: inline; margin: 0; }
+.grade-actions button { border: 1px solid var(--green); background: #fff; color: var(--green-dark); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; }

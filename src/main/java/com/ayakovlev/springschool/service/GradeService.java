@@ -93,8 +93,30 @@ public class GradeService {
         grade.setStudent(studentRepository.findById(studentId).orElseThrow());
         grade.setKind(kind == null || kind.isBlank() ? null : kind);
         grade.setScore(score);
-        grade.setComment(comment == null || comment.isBlank() ? null : comment.trim());
+        String text = comment == null ? "" : comment.trim();
+        text = stripPrefix(text);
+        String[] prefixes = kind == null ? null : PREFIX.get(kind);
+        String lang = grade.getCourseLesson().getSubject().getLanguage();
+        if (prefixes != null) {
+            String prefix = "ru".equals(lang) ? prefixes[1] : prefixes[0];
+            text = text.isEmpty() ? prefix : prefix + ": " + text;
+        }
+        grade.setComment(text.isEmpty() ? null : text);
         return grade.getCourseLesson().getId();
+    }
+
+    private String stripPrefix(String text) {
+        for (String[] pair : PREFIX.values()) {
+            for (String p : pair) {
+                if (text.equals(p)) {
+                    return "";
+                }
+                if (text.startsWith(p + ": ")) {
+                    return text.substring(p.length() + 2).trim();
+                }
+            }
+        }
+        return text;
     }
 
     @Transactional
