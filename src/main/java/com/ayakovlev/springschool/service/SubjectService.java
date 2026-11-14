@@ -79,15 +79,8 @@ public class SubjectService {
     }
 
     @Transactional(readOnly = true)
-    public Set<String> plannedKeys(LocalDate today) {
-        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
-        Set<String> keys = new HashSet<>();
-        for (Subject s : subjectRepository.findByAcademicYear(year)) {
-            for (SchoolClass c : s.getClasses()) {
-                keys.add(s.getName() + "|" + c.getClassName());
-            }
-        }
-        return keys;
+    public Set<Long> plannedSubjectIds() {
+        return courseLessonRepository.findSubjectIdsWithLessons();
     }
 
     @Transactional(readOnly = true)

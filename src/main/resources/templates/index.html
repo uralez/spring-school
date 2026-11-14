@@ -45,11 +45,14 @@
         </td>
         <td th:each="d : ${#numbers.sequence(1,5)}">
           <div class="lesson" th:each="lesson : ${row.lessons().get(d)}">
-            <b th:if="${plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}"><a th:href="@{/subject/{name}/{cls}(name=${lesson.subjectName},cls=${lesson.mainGroup})}" th:text="${lesson.subjectName}"></a></b>
-            <b th:unless="${plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}" th:text="${lesson.subjectName}"></b>
+            <b th:if="${lesson.subject != null and plannedSubjects.contains(lesson.subject.id)}">
+              <a th:href="@{/subject/{id}(id=${lesson.subject.id})}" th:text="${lesson.subjectName}"></a>
+            </b>
+            <b th:unless="${lesson.subject != null and plannedSubjects.contains(lesson.subject.id)}"
+               th:text="${lesson.subjectName}"></b>
             <span class="groups" th:text="${#strings.setJoin(lesson.groups, ', ')}"></span>
             <small th:text="#{timetable.room(${lesson.classroom})}"></small>
-            <form th:if="${canEditPlans and !plannedKeys.contains(lesson.subjectName + '|' + lesson.mainGroup)}"
+            <form th:if="${canEditPlans and !(lesson.subject != null and plannedSubjects.contains(lesson.subject.id))}"
                   th:action="@{/manage/plan/create/{id}(id=${lesson.id})}" method="post" class="plan-create">
               <button type="submit" th:title="#{timetable.createplan}">+</button>
             </form>

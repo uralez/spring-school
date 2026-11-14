@@ -31,6 +31,10 @@ public class Lesson {
     @Column(name = "class_name")
     private Set<String> groups = new HashSet<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
     public String getMainGroup() {
         return groups.stream().sorted().findFirst().orElse("");
     }

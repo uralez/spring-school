@@ -15,8 +15,7 @@
 <header th:replace="~{fragments/header :: header}"></header>
 <div class="container lesson-page">
     <p th:if="${!subject.classes.isEmpty()}" class="no-print">
-        <a th:href="@{/subject/{n}/{c}(n=${subject.name},c=${subject.classes[0].className})}"
-           th:text="'‹ ' + #{lesson.back}">Back</a>
+        <a th:href="@{/subject/{id}(id=${subject.id})}" th:text="'‹ ' + #{lesson.back}">Back</a>
     </p>
 
     <p th:if="${isAdmin}" class="no-print">

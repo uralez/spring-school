@@ -26,7 +26,7 @@ public class HomeController {
         LocalDate today = LocalDate.now();
         model.addAttribute("summary", calendarSummaryService.build(today));
         model.addAttribute("timetable", timetableService.buildTimetable(today));
-        model.addAttribute("plannedKeys", subjectService.plannedKeys(today));
+        model.addAttribute("plannedSubjects", subjectService.plannedSubjectIds());
         model.addAttribute("canEditPlans", access.canEditPlans(authentication));
         return "index";
     }

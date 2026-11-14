@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface CourseLessonRepository extends JpaRepository<CourseLesson, Long> {
 
@@ -28,4 +29,7 @@ public interface CourseLessonRepository extends JpaRepository<CourseLesson, Long
     @Query(value = "UPDATE course_lesson SET lesson_number = lesson_number - 100000 WHERE subject_id = :subjectId",
             nativeQuery = true)
     void renumberStep2(@Param("subjectId") Long subjectId);
+
+    @Query("SELECT DISTINCT c.subject.id FROM CourseLesson c")
+    Set<Long> findSubjectIdsWithLessons();
 }

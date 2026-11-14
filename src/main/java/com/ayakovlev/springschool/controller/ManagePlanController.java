@@ -38,6 +38,7 @@ public class ManagePlanController {
         String language = lesson.getSubjectName().matches(".*[а-яА-Я].*") ? "ru" : "en";
         Subject subject = planGeneratorService.create(lesson, year, language, today, username);
         String className = subject.getClasses().get(0).getClassName();
-        return "redirect:/subject/" + subject.getName() + "/" + className;
+        return "redirect:/subject/" + subject.getId();
+//        return "redirect:/subject/" + subject.getName() + "/" + className;
     }
 }

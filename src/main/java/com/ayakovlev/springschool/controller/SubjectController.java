@@ -22,22 +22,28 @@ public class SubjectController {
     private final AccessService access;
     private final ReflowService reflowService;
 
-    @GetMapping("/subject/{name}/{className}")
-    public String subject(@PathVariable String name, @PathVariable String className, Model model, Authentication authentication) {
-        Optional<Subject> subject = subjectService.find(name, className, LocalDate.now());
-        model.addAttribute("name", name);
-        model.addAttribute("className", className);
-        if (subject.isPresent()) {
-            model.addAttribute("subject", subject.get());
-            model.addAttribute("plan", subjectService.buildPlan(subject.get()));
-            model.addAttribute("currentId", subjectService.currentLessonId(subject.get().getId(), LocalDate.now()));
-            model.addAttribute("enLocale", java.util.Locale.ENGLISH);
-            model.addAttribute("canEdit", access.canEditSubject(authentication, subject.get().getId()));
-            model.addAttribute("canApprove", access.canApprove(authentication));
-            model.addAttribute("swapRules", subjectService.swapRules(subject.get().getId()));
-            model.addAttribute("needsReflow", reflowService.needsReflow(subject.get().getId()));
-            model.addAttribute("undated", subjectService.undated(subject.get().getId()));
-        }
+    @GetMapping("/subject/{id}")
+    public String subject(@PathVariable Long id, Model model, Authentication authentication) {
+        Subject subject = subjectService.subject(id);
+        model.addAttribute("subject", subject);
+        model.addAttribute("name", subject.getName());
+        model.addAttribute("className", subject.getClasses().isEmpty() ? "" : subject.getClasses().get(0).getClassName());
+        model.addAttribute("canEdit", access.canEditSubject(authentication, subject.getId()));
+        model.addAttribute("canApprove", access.canApprove(authentication));
+        model.addAttribute("plan", subjectService.buildPlan(subject));
+        model.addAttribute("currentId", subjectService.currentLessonId(subject.getId(), LocalDate.now()));
+//        model.addAttribute("offDays", subjectService.offDays(subject.getId()));
+        model.addAttribute("swapRules", subjectService.swapRules(subject.getId()));
+        model.addAttribute("needsReflow", reflowService.needsReflow(subject.getId()));
+        model.addAttribute("undated", subjectService.undated(subject.getId()));
+        model.addAttribute("enLocale", java.util.Locale.ENGLISH);
         return "subject";
+    }
+
+    @GetMapping("/subject/{name}/{className}")
+    public String legacy(@PathVariable String name, @PathVariable String className) {
+        return subjectService.find(name, className, LocalDate.now())
+                .map(s -> "redirect:/subject/" + s.getId())
+                .orElse("redirect:/");
     }
 }
