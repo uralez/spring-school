@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "lesson_slot")
@@ -18,4 +19,9 @@ public class LessonSlot extends BaseEntity {
 
     private Integer slotNumber;
     private LocalDate slotDate;
+
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private Integer startWorkMinutes;
+    private Integer endWorkMinutes;
 }
