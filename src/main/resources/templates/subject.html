@@ -95,7 +95,7 @@
                     </tr>
                     <th:block th:if="${item.kind() == 'week'}">
                         <tr th:each="l, st : ${item.lessons()}" th:id="${'lesson-' + l.id}"
-                            th:classappend="${'m' + l.plannedDate.monthValue + (l.lessonType != 'lesson' ? ' row-' + l.lessonType : '') + (l.id == currentId ? ' current' : '')}">
+                            th:classappend="${'m' + l.plannedDate.monthValue + (l.lessonType != 'lesson' ? ' row-' + l.lessonType : '') + (l.id == currentId ? ' current' : '') + (offDays.containsKey(l.plannedDate) ? ' off-day' : '')}">
                             <td th:if="${st.first}" th:rowspan="${st.size}" class="week-cell"
                                 th:classappend="${'m' + l.plannedDate.monthValue}">
                                 <span class="vert" th:text="#{plan.week(${item.weekNumber()})}"></span>

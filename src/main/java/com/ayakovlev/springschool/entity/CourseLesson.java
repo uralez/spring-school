@@ -27,4 +27,8 @@ public class CourseLesson extends BaseEntity {
     private String classworkJoint;
     private String classworkEnd;
     private String homework;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "slot_id")
+    private LessonSlot slot;
 }

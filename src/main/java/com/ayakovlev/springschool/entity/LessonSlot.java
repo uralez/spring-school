@@ -22,6 +22,6 @@ public class LessonSlot extends BaseEntity {
 
     private LocalTime startTime;
     private LocalTime endTime;
-    private Integer startWorkMinutes;
-    private Integer endWorkMinutes;
+    private Integer startWorkMinutes = 5;
+    private Integer endWorkMinutes = 5;
 }

@@ -220,3 +220,5 @@ style.css: .reflow-form { margin: 0 0 16px; }
 .grade-actions { white-space: nowrap; }
 .grade-actions form { display: inline; margin: 0; }
 .grade-actions button { border: 1px solid var(--green); background: #fff; color: var(--green-dark); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; }
+
+.plan tr.off-day td { background: #ffd6d6; }

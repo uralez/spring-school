@@ -26,6 +26,7 @@ public class SubjectService {
     private final TextbookRepository textbookRepository;
     private final StudentGradeRepository studentGradeRepository;
     private final TopicListParser topicListParser;
+    private final CalendarDayRepository calendarDayRepository;
 
     @Transactional(readOnly = true)
     public Optional<Subject> find(String name, String className, LocalDate today) {
@@ -305,5 +306,22 @@ public class SubjectService {
         lesson.setClassworkEnd(null);
         lesson.setHomework(null);
         return lesson.getSubject().getId();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<LocalDate, String> offDays(Long subjectId) {
+        List<LocalDate> dates = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+                .map(CourseLesson::getPlannedDate).filter(Objects::nonNull).toList();
+        if (dates.isEmpty()) {
+            return Map.of();
+        }
+        Map<LocalDate, String> result = new HashMap<>();
+        for (CalendarDay d : calendarDayRepository
+                .findByCalendarDateBetween(Collections.min(dates), Collections.max(dates))) {
+            if (!"working".equals(d.getDayType())) {
+                result.put(d.getCalendarDate(), d.getDayType());
+            }
+        }
+        return result;
     }
 }

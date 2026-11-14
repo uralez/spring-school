@@ -99,19 +99,66 @@ public class ReflowService {
         if (layout == null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
+        List<LessonSlot> existing = lessonSlotRepository.findBySubjectIdOrderBySlotNumber(subjectId);
+        Map<LocalDate, LessonSlot> byDate = new HashMap<>();
+        for (LessonSlot s : existing) {
+            byDate.put(s.getSlotDate(), s);
+        }
         List<LocalDate> free = layout.free();
+
+        for (CourseLesson l : layout.movable()) {
+            l.setSlot(null);
+            l.setPlannedDate(null);
+        }
+        courseLessonRepository.flush();
+
+        Set<LocalDate> keep = new HashSet<>(free);
+        for (CourseLesson l : courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId)) {
+            if (l.getSlot() != null) {
+                keep.add(l.getSlot().getSlotDate());
+            }
+        }
+        for (LessonSlot s : existing) {
+            if (!keep.contains(s.getSlotDate())) {
+                lessonSlotRepository.delete(s);
+            }
+        }
+        lessonSlotRepository.flush();
+
+        Map<LocalDate, LessonSlot> slots = new HashMap<>();
+        for (LessonSlot s : lessonSlotRepository.findBySubjectIdOrderBySlotNumber(subjectId)) {
+            slots.put(s.getSlotDate(), s);
+        }
+        List<LessonSlot> fresh = new ArrayList<>();
+        for (LocalDate d : free) {
+            if (!slots.containsKey(d)) {
+                LessonSlot s = new LessonSlot();
+                s.setSubject(subject);
+                s.setSlotDate(d);
+                s.setSlotNumber(900000 + fresh.size());
+                fresh.add(s);
+                slots.put(d, s);
+            }
+        }
+        lessonSlotRepository.saveAll(fresh);
 
         int i = 0;
         for (CourseLesson l : layout.movable()) {
-            l.setPlannedDate(i < free.size() ? free.get(i++) : null);
+            if (i < free.size()) {
+                LessonSlot s = slots.get(free.get(i++));
+                l.setSlot(s);
+                l.setPlannedDate(s.getSlotDate());
+            }
         }
         List<CourseLesson> created = new ArrayList<>();
         int temp = 900000;
         while (i < free.size()) {
+            LessonSlot s = slots.get(free.get(i++));
             CourseLesson l = new CourseLesson();
             l.setSubject(subject);
             l.setLessonType("lesson");
-            l.setPlannedDate(free.get(i++));
+            l.setSlot(s);
+            l.setPlannedDate(s.getSlotDate());
             l.setLessonNumber(++temp);
             created.add(l);
         }
@@ -119,17 +166,7 @@ public class ReflowService {
         courseLessonRepository.renumberStep1(subjectId);
         courseLessonRepository.renumberStep2(subjectId);
 
-        lessonSlotRepository.deleteBySubject(subjectId);
-        Subject fresh = subjectRepository.findById(subjectId).orElseThrow();
-        List<LessonSlot> slots = new ArrayList<>();
-        int n = 0;
-        for (LocalDate d : layout.available()) {
-            LessonSlot s = new LessonSlot();
-            s.setSubject(fresh);
-            s.setSlotNumber(++n);
-            s.setSlotDate(d);
-            slots.add(s);
-        }
-        lessonSlotRepository.saveAll(slots);
+        lessonSlotRepository.renumberStep1(subjectId);
+        lessonSlotRepository.renumberStep2(subjectId);
     }
 }

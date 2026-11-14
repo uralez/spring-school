@@ -32,11 +32,11 @@ public class SubjectController {
         model.addAttribute("canApprove", access.canApprove(authentication));
         model.addAttribute("plan", subjectService.buildPlan(subject));
         model.addAttribute("currentId", subjectService.currentLessonId(subject.getId(), LocalDate.now()));
-//        model.addAttribute("offDays", subjectService.offDays(subject.getId()));
         model.addAttribute("swapRules", subjectService.swapRules(subject.getId()));
         model.addAttribute("needsReflow", reflowService.needsReflow(subject.getId()));
         model.addAttribute("undated", subjectService.undated(subject.getId()));
         model.addAttribute("enLocale", java.util.Locale.ENGLISH);
+        model.addAttribute("offDays", subjectService.offDays(subject.getId()));
         return "subject";
     }
 
