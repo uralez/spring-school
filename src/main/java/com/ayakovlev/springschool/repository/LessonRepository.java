@@ -26,4 +26,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Integer> {
         ORDER BY l.startTime
         """)
     List<Lesson> findBySubjectAndGroups(@Param("name") String name, @Param("groups") Collection<String> groups);
+
+    List<Lesson> findBySubjectIdOrderByStartTime(Long subjectId);
 }

@@ -6,6 +6,12 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
+
+/**
+ * Один урок длинной 45 минут. У него есть тема, две самостоятельные, лекция, домашка и оценки.
+ *
+ * TODO Надо переименовать в Lesson, сейчас это сделать нельзя, потому что это имя занято классом, который мы переименуем в Timetable
+ */
 @Entity
 @Table(name = "course_lesson")
 @Getter
@@ -31,4 +37,8 @@ public class CourseLesson extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "slot_id")
     private LessonSlot slot;
+
+    public LocalDate getPlannedDate() {
+        return slot != null ? slot.getSlotDate() : plannedDate;
+    }
 }

@@ -24,6 +24,7 @@ public class PlanGeneratorService {
     private final SubjectRepository subjectRepository;
     private final CourseLessonRepository courseLessonRepository;
     private final TeacherRepository teacherRepository;
+    private final LessonSlotRepository lessonSlotRepository;
 
     private record Slot(LocalDate date, LocalTime time, int module) {
     }
@@ -33,11 +34,17 @@ public class PlanGeneratorService {
         String name = source.getSubjectName();
         List<String> groups = source.getGroups().stream().sorted().toList();
         Optional<Subject> existing = subjectRepository.findByNameYearAndClass(name, year, groups.get(0));
-        if (existing.isPresent()) {
+
+        // если уч.предмет существует и множество его уроков не пусто => выходим
+        if (existing.isPresent() && !courseLessonRepository.findBySubjectIdOrderByLessonNumber(existing.get().getId()).isEmpty()) {
             return existing.get();
         }
+//        if (existing.isPresent()) {
+//            return existing.get();
+//        }
 
-        List<Lesson> timetable = lessonRepository.findBySubjectAndGroups(name, groups);
+        List<Lesson> timetable = lessonRepository.findBySubjectIdOrderByStartTime(source.getSubject().getId());
+//        List<Lesson> timetable = lessonRepository.findBySubjectAndGroups(name, groups);
         List<AcademicModule> modules = academicModuleRepository.findAll(Sort.by("moduleNumber"));
         int lastModule = modules.get(modules.size() - 1).getModuleNumber();
 
@@ -60,29 +67,44 @@ public class PlanGeneratorService {
         }
         slots.sort(Comparator.comparing(Slot::date).thenComparing(Slot::time));
 
-        Subject subject = new Subject();
+        Subject subject = existing.orElseGet(Subject::new);
+//        Subject subject = new Subject();
+
         subject.setName(name);
         subject.setAcademicYear(year);
         subject.setLanguage(language);
-        for (String g : groups) {
-            SchoolClass c = new SchoolClass();
-            c.setClassName(g);
-            c.setGrade(Integer.parseInt(g.replaceAll("\\..*$", "")));
-            subject.getClasses().add(c);
+        if (subject.getClasses().isEmpty()) {
+            for (String g : groups) {
+                SchoolClass c = new SchoolClass();
+                c.setClassName(g);
+                c.setGrade(Integer.parseInt(g.replaceAll("\\..*$", "")));
+                subject.getClasses().add(c);
+            }
         }
         subjectRepository.save(subject);
 
         teacherRepository.findByUserUsername(username).ifPresent(t -> subject.getTeachers().add(t));
 
+
+
         Map<Integer, Long> total = slots.stream()
                 .collect(Collectors.groupingBy(Slot::module, Collectors.counting()));
         Map<Integer, Integer> seen = new HashMap<>();
+        List<LessonSlot> slotEntities = new ArrayList<>();
         List<CourseLesson> lessons = new ArrayList<>();
         int number = 0;
         for (Slot s : slots) {
             int index = seen.merge(s.module(), 1, Integer::sum);
             int k = (int) (total.get(s.module()) - index + 1);
             String kind = kind(s.module(), k, lastModule);
+
+            LessonSlot slot = new LessonSlot();
+            slot.setSubject(subject);
+            slot.setSlotNumber(number + 1);
+            slot.setSlotDate(s.date());
+            slot.setStartTime(s.time());
+            slot.setEndTime(s.time().plusMinutes(45));
+            slotEntities.add(slot);
 
             CourseLesson lesson = new CourseLesson();
             lesson.setSubject(subject);
@@ -94,13 +116,16 @@ public class PlanGeneratorService {
                 case "final" -> "Final review";
                 default -> null;
             });
+            lesson.setSlot(slot);
             lesson.setPlannedDate(s.date());
             if (!s.date().isAfter(today)) {
                 lesson.setActualDate(s.date());
             }
             lessons.add(lesson);
         }
+        lessonSlotRepository.saveAll(slotEntities);
         courseLessonRepository.saveAll(lessons);
+
         return subject;
     }
 

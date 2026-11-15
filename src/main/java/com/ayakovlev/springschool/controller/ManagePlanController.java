@@ -28,7 +28,6 @@ public class ManagePlanController {
 
     @PostMapping("/create/{lessonId}")
     @PreAuthorize("@access.canEditPlans(authentication)")
-//    @Transactional(readOnly = true)
     public String create(@PathVariable Integer lessonId, @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         Lesson lesson = lessonRepository.findById(lessonId)
