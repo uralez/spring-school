@@ -1,6 +1,6 @@
 package com.ayakovlev.springschool.controller;
 
-import com.ayakovlev.springschool.entity.CourseLesson;
+import com.ayakovlev.springschool.entity.Lesson;
 import com.ayakovlev.springschool.entity.Student;
 import com.ayakovlev.springschool.service.GradeService;
 import com.ayakovlev.springschool.service.MarkdownService;
@@ -35,7 +35,7 @@ public class PrintController {
                         @RequestParam(required = false) List<Long> studentIds,
                         @RequestParam(defaultValue = "0") int blanks,
                         Model model) {
-        CourseLesson lesson = subjectService.findLesson(id)
+        Lesson lesson = subjectService.findLesson(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Set<Long> chosen = studentIds == null ? Set.of() : new HashSet<>(studentIds);
         List<String> names = new ArrayList<>();

@@ -20,11 +20,11 @@ public class ReflowService {
     private final SubjectRepository subjectRepository;
     private final TimetableEntryRepository timetableEntryRepository;
     private final CalendarDayRepository calendarDayRepository;
-    private final CourseLessonRepository courseLessonRepository;
+    private final LessonRepository lessonRepository;
     private final LessonSlotRepository lessonSlotRepository;
     private final StudentGradeRepository studentGradeRepository;
 
-    private record Layout(List<LocalDate> available, List<CourseLesson> movable, List<LocalDate> free) {
+    private record Layout(List<LocalDate> available, List<Lesson> movable, List<LocalDate> free) {
     }
 
     private Layout layout(Subject subject) {
@@ -52,9 +52,9 @@ public class ReflowService {
         Collections.sort(available);
 
         Set<Long> graded = studentGradeRepository.gradedLessonIds(subject.getId());
-        List<CourseLesson> movable = new ArrayList<>();
+        List<Lesson> movable = new ArrayList<>();
         LocalDate lastFixed = LocalDate.MIN;
-        for (CourseLesson l : courseLessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId())) {
+        for (Lesson l : lessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId())) {
             boolean fixed = l.getActualDate() != null || graded.contains(l.getId());
             if (!fixed) {
                 movable.add(l);
@@ -105,14 +105,14 @@ public class ReflowService {
         }
         List<LocalDate> free = layout.free();
 
-        for (CourseLesson l : layout.movable()) {
+        for (Lesson l : layout.movable()) {
             l.setSlot(null);
 //            l.setPlannedDate(null);
         }
-        courseLessonRepository.flush();
+        lessonRepository.flush();
 
         Set<LocalDate> keep = new HashSet<>(free);
-        for (CourseLesson l : courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId)) {
+        for (Lesson l : lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId)) {
             if (l.getSlot() != null) {
                 keep.add(l.getSlot().getSlotDate());
             }
@@ -142,18 +142,18 @@ public class ReflowService {
         lessonSlotRepository.saveAll(fresh);
 
         int i = 0;
-        for (CourseLesson l : layout.movable()) {
+        for (Lesson l : layout.movable()) {
             if (i < free.size()) {
                 LessonSlot s = slots.get(free.get(i++));
                 l.setSlot(s);
 //                l.setPlannedDate(s.getSlotDate());
             }
         }
-        List<CourseLesson> created = new ArrayList<>();
+        List<Lesson> created = new ArrayList<>();
         int temp = 900000;
         while (i < free.size()) {
             LessonSlot s = slots.get(free.get(i++));
-            CourseLesson l = new CourseLesson();
+            Lesson l = new Lesson();
             l.setSubject(subject);
             l.setLessonType("lesson");
             l.setSlot(s);
@@ -161,9 +161,9 @@ public class ReflowService {
             l.setLessonNumber(++temp);
             created.add(l);
         }
-        courseLessonRepository.saveAll(created);
-        courseLessonRepository.renumberStep1(subjectId);
-        courseLessonRepository.renumberStep2(subjectId);
+        lessonRepository.saveAll(created);
+        lessonRepository.renumberStep1(subjectId);
+        lessonRepository.renumberStep2(subjectId);
 
         lessonSlotRepository.renumberStep1(subjectId);
         lessonSlotRepository.renumberStep2(subjectId);

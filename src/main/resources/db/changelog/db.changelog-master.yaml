@@ -43,3 +43,6 @@
       file: db/changelog/changes/021_drop_planned_date.sql
   - include:
       file: db/changelog/changes/022_rename_lessons_to_timetable.sql
+  - include:
+      file: db/changelog/changes/023_rename_course_lesson_to_lesson.sql
+

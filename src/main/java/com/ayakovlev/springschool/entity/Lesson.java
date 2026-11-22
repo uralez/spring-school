@@ -13,10 +13,10 @@ import java.time.LocalDate;
  * TODO Надо переименовать в Lesson, сейчас это сделать нельзя, потому что это имя занято классом, который мы переименуем в Timetable
  */
 @Entity
-@Table(name = "course_lesson")
+@Table(name = "lesson")
 @Getter
 @Setter
-public class CourseLesson extends BaseEntity {
+public class Lesson extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subject_id")

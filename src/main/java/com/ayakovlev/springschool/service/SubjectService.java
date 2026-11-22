@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class SubjectService {
 
     private final SubjectRepository subjectRepository;
-    private final CourseLessonRepository courseLessonRepository;
+    private final LessonRepository lessonRepository;
     private final AcademicModuleRepository academicModuleRepository;
     private final TextbookRepository textbookRepository;
     private final StudentGradeRepository studentGradeRepository;
@@ -35,13 +35,13 @@ public class SubjectService {
 //    }
 
     @Transactional(readOnly = true)
-    public List<CourseLesson> lessons(Long subjectId) {
-        return courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId);
+    public List<Lesson> lessons(Long subjectId) {
+        return lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId);
     }
 
     @Transactional(readOnly = true)
     public List<PlanItem> buildPlan(Subject subject) {
-        List<CourseLesson> lessons = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId());
+        List<Lesson> lessons = lessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId());
         long shift = subject.getAcademicYear() - 2026L;
         List<AcademicModule> modules = academicModuleRepository.findAll(Sort.by("moduleNumber"));
         List<PlanItem> items = new ArrayList<>();
@@ -51,13 +51,13 @@ public class SubjectService {
             LocalDate start = m.getStartDate().plusYears(shift);
             LocalDate end = m.getEndDate().plusYears(shift);
             items.add(PlanItem.module(m.getModuleNumber()));
-            Map<LocalDate, List<CourseLesson>> byWeek = lessons.stream()
+            Map<LocalDate, List<Lesson>> byWeek = lessons.stream()
                     .filter(l -> l.getPlannedDate() != null
                             && !l.getPlannedDate().isBefore(start) && !l.getPlannedDate().isAfter(end))
                     .collect(Collectors.groupingBy(
                             l -> l.getPlannedDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
                             LinkedHashMap::new, Collectors.toList()));
-            for (List<CourseLesson> week : byWeek.values()) {
+            for (List<Lesson> week : byWeek.values()) {
                 items.add(PlanItem.week(++weekNumber, week));
             }
             if (i + 1 < modules.size()) {
@@ -72,28 +72,28 @@ public class SubjectService {
 
     @Transactional(readOnly = true)
     public Long currentLessonId(Long subjectId, LocalDate today) {
-        return courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+        return lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
                 .filter(l -> l.getPlannedDate() != null && !l.getPlannedDate().isAfter(today))
                 .reduce((first, second) -> second)
-                .map(CourseLesson::getId)
+                .map(Lesson::getId)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
     public Set<Long> plannedSubjectIds() {
-        return courseLessonRepository.findSubjectIdsWithLessons();
+        return lessonRepository.findSubjectIdsWithLessons();
     }
 
     @Transactional(readOnly = true)
-    public Optional<CourseLesson> findLesson(Long id) {
-        return courseLessonRepository.findById(id);
+    public Optional<Lesson> findLesson(Long id) {
+        return lessonRepository.findById(id);
     }
 
     @Transactional
-    public CourseLesson updateLesson(Long id, String topic, String comment, LocalDate actualDate,
-                                     String lecture, String classworkStart, String classworkJoint,
-                                     String classworkEnd, String homework) {
-        CourseLesson lesson = courseLessonRepository.findById(id)
+    public Lesson updateLesson(Long id, String topic, String comment, LocalDate actualDate,
+                               String lecture, String classworkStart, String classworkJoint,
+                               String classworkEnd, String homework) {
+        Lesson lesson = lessonRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         lesson.setTopic(blankToNull(topic));
         lesson.setComment(blankToNull(comment));
@@ -111,21 +111,21 @@ public class SubjectService {
     }
 
     @Transactional(readOnly = true)
-    public LocalDate nextLessonDate(CourseLesson lesson) {
-        return courseLessonRepository
+    public LocalDate nextLessonDate(Lesson lesson) {
+        return lessonRepository
                 .findBySubjectIdAndLessonNumber(lesson.getSubject().getId(), lesson.getLessonNumber() + 1)
-                .map(CourseLesson::getPlannedDate)
+                .map(Lesson::getPlannedDate)
                 .orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public String previousTopic(CourseLesson lesson) {
+    public String previousTopic(Lesson lesson) {
         if (lesson.getLessonNumber() <= 1) {
             return null;
         }
-        return courseLessonRepository
+        return lessonRepository
                 .findBySubjectIdAndLessonNumber(lesson.getSubject().getId(), lesson.getLessonNumber() - 1)
-                .map(CourseLesson::getTopic)
+                .map(Lesson::getTopic)
                 .orElse(null);
     }
 
@@ -161,8 +161,8 @@ public class SubjectService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<CourseLesson> neighbor(CourseLesson lesson, int delta) {
-        return courseLessonRepository.findBySubjectIdAndLessonNumber(
+    public Optional<Lesson> neighbor(Lesson lesson, int delta) {
+        return lessonRepository.findBySubjectIdAndLessonNumber(
                 lesson.getSubject().getId(), lesson.getLessonNumber() + delta);
     }
 
@@ -178,7 +178,7 @@ public class SubjectService {
 
     @Transactional(readOnly = true)
     public SwapRules swapRules(Long subjectId) {
-        List<CourseLesson> list = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId);
+        List<Lesson> list = lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId);
         Set<Long> graded = studentGradeRepository.gradedLessonIds(subjectId);
         Set<Long> up = new HashSet<>();
         Set<Long> down = new HashSet<>();
@@ -198,11 +198,11 @@ public class SubjectService {
 
     @Transactional
     public void swapWithNeighbor(Long subjectId, Long lessonId, int delta) {
-        CourseLesson a = courseLessonRepository.findById(lessonId).orElseThrow();
+        Lesson a = lessonRepository.findById(lessonId).orElseThrow();
         if (!a.getSubject().getId().equals(subjectId) || Math.abs(delta) != 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
-        CourseLesson b = courseLessonRepository.findBySubjectIdAndLessonNumber(
+        Lesson b = lessonRepository.findBySubjectIdAndLessonNumber(
                 subjectId, a.getLessonNumber() + delta).orElseThrow();
         Set<Long> graded = studentGradeRepository.gradedLessonIds(subjectId);
         if (graded.contains(a.getId()) || graded.contains(b.getId())) {
@@ -237,27 +237,27 @@ public class SubjectService {
     }
 
     @Transactional(readOnly = true)
-    public List<CourseLesson> undated(Long subjectId) {
-        return courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+    public List<Lesson> undated(Long subjectId) {
+        return lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
                 .filter(l -> l.getPlannedDate() == null).toList();
     }
 
     @Transactional(readOnly = true)
     public long gradeCount(Long lessonId) {
-        return studentGradeRepository.countByCourseLessonId(lessonId);
+        return studentGradeRepository.countByLessonId(lessonId);
     }
 
     @Transactional
     public Long deleteLesson(Long lessonId) {
-        CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
         if (lesson.getPlannedDate() != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
         }
         Long subjectId = lesson.getSubject().getId();
-        courseLessonRepository.delete(lesson);
-        courseLessonRepository.flush();
-        courseLessonRepository.renumberStep1(subjectId);
-        courseLessonRepository.renumberStep2(subjectId);
+        lessonRepository.delete(lesson);
+        lessonRepository.flush();
+        lessonRepository.renumberStep1(subjectId);
+        lessonRepository.renumberStep2(subjectId);
         return subjectId;
     }
 
@@ -268,7 +268,7 @@ public class SubjectService {
     public ImportResult importTopics(Long subjectId, String text) {
         Subject subject = subjectRepository.findById(subjectId).orElseThrow();
         List<String> topics = topicListParser.parse(text);
-        List<CourseLesson> empty = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+        List<Lesson> empty = lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
                 .filter(l -> "lesson".equals(l.getLessonType()))
                 .filter(l -> l.getTopic() == null || l.getTopic().isBlank())
                 .toList();
@@ -277,27 +277,27 @@ public class SubjectService {
             empty.get(i).setTopic(topics.get(i));
         }
         List<String> extra = new ArrayList<>(topics.subList(n, topics.size()));
-        List<CourseLesson> created = new ArrayList<>();
+        List<Lesson> created = new ArrayList<>();
         int temp = 900000;
         for (String topic : extra) {
-            CourseLesson l = new CourseLesson();
+            Lesson l = new Lesson();
             l.setSubject(subject);
             l.setLessonType("lesson");
             l.setTopic(topic);
             l.setLessonNumber(++temp);
             created.add(l);
         }
-        courseLessonRepository.saveAll(created);
+        lessonRepository.saveAll(created);
         if (!created.isEmpty()) {
-            courseLessonRepository.renumberStep1(subjectId);
-            courseLessonRepository.renumberStep2(subjectId);
+            lessonRepository.renumberStep1(subjectId);
+            lessonRepository.renumberStep2(subjectId);
         }
         return new ImportResult(n, extra);
     }
 
     @Transactional
     public Long clearLesson(Long lessonId) {
-        CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
         lesson.setTopic(null);
         lesson.setComment(null);
         lesson.setLecture(null);
@@ -310,8 +310,8 @@ public class SubjectService {
 
     @Transactional(readOnly = true)
     public Map<LocalDate, String> offDays(Long subjectId) {
-        List<LocalDate> dates = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
-                .map(CourseLesson::getPlannedDate).filter(Objects::nonNull).toList();
+        List<LocalDate> dates = lessonRepository.findBySubjectIdOrderByLessonNumber(subjectId).stream()
+                .map(Lesson::getPlannedDate).filter(Objects::nonNull).toList();
         if (dates.isEmpty()) {
             return Map.of();
         }

@@ -1,6 +1,6 @@
 package com.ayakovlev.springschool.controller;
 
-import com.ayakovlev.springschool.entity.CourseLesson;
+import com.ayakovlev.springschool.entity.Lesson;
 import com.ayakovlev.springschool.entity.SchoolClass;
 import com.ayakovlev.springschool.service.GradeService;
 import com.ayakovlev.springschool.service.SubjectService;
@@ -27,7 +27,7 @@ public class AdminLessonController {
 
     @GetMapping("/{id}/edit")
     public String form(@PathVariable Long id, Model model) {
-        CourseLesson lesson = subjectService.findLesson(id)
+        Lesson lesson = subjectService.findLesson(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         model.addAttribute("lesson", lesson);
 

@@ -26,10 +26,10 @@ public class GradeService {
     private final GroupMembershipRepository groupMembershipRepository;
     private final StudentGradeRepository studentGradeRepository;
     private final StudentRepository studentRepository;
-    private final CourseLessonRepository courseLessonRepository;
+    private final LessonRepository lessonRepository;
 
     @Transactional(readOnly = true)
-    public List<Student> studentsFor(CourseLesson lesson) {
+    public List<Student> studentsFor(Lesson lesson) {
         Set<String> names = lesson.getSubject().getClasses().stream()
                 .map(SchoolClass::getClassName).collect(Collectors.toSet());
         return groupMembershipRepository.findByGroupNameInAndActiveTrueOrderByStudentUserFullName(names)
@@ -38,16 +38,16 @@ public class GradeService {
 
     @Transactional(readOnly = true)
     public List<StudentGrade> gradesFor(Long lessonId) {
-        return studentGradeRepository.findByCourseLessonIdOrderByDcre(lessonId);
+        return studentGradeRepository.findByLessonIdOrderByDcre(lessonId);
     }
 
     @Transactional
     public void addGrade(Long lessonId, Long studentId, String kind, int score, String comment) {
-        CourseLesson lesson = courseLessonRepository.findById(lessonId).orElseThrow();
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
         Student student = studentRepository.findById(studentId).orElseThrow();
         StudentGrade grade = new StudentGrade();
         grade.setStudent(student);
-        grade.setCourseLesson(lesson);
+        grade.setLesson(lesson);
         grade.setScore(score);
         grade.setKind(kind == null || kind.isBlank() ? null : kind);
         grade.setComment(buildComment(lesson.getSubject().getLanguage(), kind, comment));
@@ -66,7 +66,7 @@ public class GradeService {
 
     @Transactional(readOnly = true)
     public Gradebook gradebook(Subject subject, LocalDate today) {
-        List<CourseLesson> lessons = courseLessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId()).stream()
+        List<Lesson> lessons = lessonRepository.findBySubjectIdOrderByLessonNumber(subject.getId()).stream()
                 .filter(l -> l.getPlannedDate() != null && !l.getPlannedDate().isAfter(today))
                 .toList();
         Set<String> names = subject.getClasses().stream()
@@ -77,10 +77,10 @@ public class GradeService {
 
         Map<String, List<Integer>> byCell = new LinkedHashMap<>();
         Set<Long> graded = new HashSet<>();
-        for (StudentGrade g : studentGradeRepository.findByCourseLessonSubjectIdOrderByDcre(subject.getId())) {
-            byCell.computeIfAbsent(g.getStudent().getId() + ":" + g.getCourseLesson().getId(),
+        for (StudentGrade g : studentGradeRepository.findByLessonSubjectIdOrderByDcre(subject.getId())) {
+            byCell.computeIfAbsent(g.getStudent().getId() + ":" + g.getLesson().getId(),
                     k -> new ArrayList<>()).add(g.getScore());
-            graded.add(g.getCourseLesson().getId());
+            graded.add(g.getLesson().getId());
         }
         Map<String, String> cells = new HashMap<>();
         byCell.forEach((k, v) -> cells.put(k, v.stream().map(String::valueOf).collect(Collectors.joining(", "))));
@@ -96,13 +96,13 @@ public class GradeService {
         String text = comment == null ? "" : comment.trim();
         text = stripPrefix(text);
         String[] prefixes = kind == null ? null : PREFIX.get(kind);
-        String lang = grade.getCourseLesson().getSubject().getLanguage();
+        String lang = grade.getLesson().getSubject().getLanguage();
         if (prefixes != null) {
             String prefix = "ru".equals(lang) ? prefixes[1] : prefixes[0];
             text = text.isEmpty() ? prefix : prefix + ": " + text;
         }
         grade.setComment(text.isEmpty() ? null : text);
-        return grade.getCourseLesson().getId();
+        return grade.getLesson().getId();
     }
 
     private String stripPrefix(String text) {
@@ -122,7 +122,7 @@ public class GradeService {
     @Transactional
     public Long deleteGrade(Long gradeId) {
         StudentGrade grade = studentGradeRepository.findById(gradeId).orElseThrow();
-        Long lessonId = grade.getCourseLesson().getId();
+        Long lessonId = grade.getLesson().getId();
         studentGradeRepository.delete(grade);
         return lessonId;
     }

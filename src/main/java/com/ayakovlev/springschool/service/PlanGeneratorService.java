@@ -22,7 +22,7 @@ public class PlanGeneratorService {
     private final CalendarDayRepository calendarDayRepository;
     private final AcademicModuleRepository academicModuleRepository;
     private final SubjectRepository subjectRepository;
-    private final CourseLessonRepository courseLessonRepository;
+    private final LessonRepository lessonRepository;
     private final TeacherRepository teacherRepository;
     private final LessonSlotRepository lessonSlotRepository;
 
@@ -36,7 +36,7 @@ public class PlanGeneratorService {
         Optional<Subject> existing = subjectRepository.findByNameYearAndClass(name, year, groups.get(0));
 
         // если уч.предмет существует и множество его уроков не пусто => выходим
-        if (existing.isPresent() && !courseLessonRepository.findBySubjectIdOrderByLessonNumber(existing.get().getId()).isEmpty()) {
+        if (existing.isPresent() && !lessonRepository.findBySubjectIdOrderByLessonNumber(existing.get().getId()).isEmpty()) {
             return existing.get();
         }
 //        if (existing.isPresent()) {
@@ -91,7 +91,7 @@ public class PlanGeneratorService {
                 .collect(Collectors.groupingBy(Slot::module, Collectors.counting()));
         Map<Integer, Integer> seen = new HashMap<>();
         List<LessonSlot> slotEntities = new ArrayList<>();
-        List<CourseLesson> lessons = new ArrayList<>();
+        List<Lesson> lessons = new ArrayList<>();
         int number = 0;
         for (Slot s : slots) {
             int index = seen.merge(s.module(), 1, Integer::sum);
@@ -106,7 +106,7 @@ public class PlanGeneratorService {
             slot.setEndTime(s.time().plusMinutes(45));
             slotEntities.add(slot);
 
-            CourseLesson lesson = new CourseLesson();
+            Lesson lesson = new Lesson();
             lesson.setSubject(subject);
             lesson.setLessonNumber(++number);
             lesson.setLessonType(kind.equals("final") ? "review" : kind);
@@ -124,7 +124,7 @@ public class PlanGeneratorService {
             lessons.add(lesson);
         }
         lessonSlotRepository.saveAll(slotEntities);
-        courseLessonRepository.saveAll(lessons);
+        lessonRepository.saveAll(lessons);
 
         return subject;
     }

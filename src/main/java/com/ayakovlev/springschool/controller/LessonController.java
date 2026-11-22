@@ -1,6 +1,6 @@
 package com.ayakovlev.springschool.controller;
 
-import com.ayakovlev.springschool.entity.CourseLesson;
+import com.ayakovlev.springschool.entity.Lesson;
 import com.ayakovlev.springschool.service.AccessService;
 import com.ayakovlev.springschool.service.GradeService;
 import com.ayakovlev.springschool.service.MarkdownService;
@@ -25,7 +25,7 @@ public class LessonController {
 
     @GetMapping("/lesson/{id}")
     public String lesson(@PathVariable Long id, Model model, Authentication authentication) {
-        CourseLesson lesson = subjectService.findLesson(id)
+        Lesson lesson = subjectService.findLesson(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         model.addAttribute("lesson", lesson);
         model.addAttribute("subject", lesson.getSubject());

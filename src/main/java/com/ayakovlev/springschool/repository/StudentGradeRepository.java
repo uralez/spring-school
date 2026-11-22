@@ -10,14 +10,14 @@ import java.util.Set;
 
 public interface StudentGradeRepository extends JpaRepository<StudentGrade, Long> {
 
-    List<StudentGrade> findByCourseLessonIdOrderByDcre(Long courseLessonId);
+    List<StudentGrade> findByLessonIdOrderByDcre(Long lessonId);
 
-    List<StudentGrade> findByCourseLessonSubjectIdOrderByDcre(Long subjectId);
+    List<StudentGrade> findByLessonSubjectIdOrderByDcre(Long subjectId);
 
-    boolean existsByCourseLessonId(Long courseLessonId);
+    boolean existsByLessonId(Long lessonId);
 
-    @Query("SELECT DISTINCT g.courseLesson.id FROM StudentGrade g WHERE g.courseLesson.subject.id = :subjectId")
+    @Query("SELECT DISTINCT g.lesson.id FROM StudentGrade g WHERE g.lesson.subject.id = :subjectId")
     Set<Long> gradedLessonIds(@Param("subjectId") Long subjectId);
 
-    long countByCourseLessonId(Long courseLessonId);
+    long countByLessonId(Long lessonId);
 }

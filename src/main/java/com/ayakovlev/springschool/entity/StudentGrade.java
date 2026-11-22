@@ -16,7 +16,7 @@ public class StudentGrade extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_lesson_id")
-    private CourseLesson courseLesson;
+    private Lesson lesson;
 
     private Integer score;
     private String comment;
