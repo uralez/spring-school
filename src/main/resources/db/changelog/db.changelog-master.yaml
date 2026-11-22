@@ -41,3 +41,5 @@
       file: db/changelog/changes/020_slot_times.sql
   - include:
       file: db/changelog/changes/021_drop_planned_date.sql
+  - include:
+      file: db/changelog/changes/022_rename_lessons_to_timetable.sql

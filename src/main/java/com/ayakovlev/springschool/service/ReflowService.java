@@ -18,7 +18,7 @@ import java.util.*;
 public class ReflowService {
 
     private final SubjectRepository subjectRepository;
-    private final LessonRepository lessonRepository;
+    private final TimetableEntryRepository timetableEntryRepository;
     private final CalendarDayRepository calendarDayRepository;
     private final CourseLessonRepository courseLessonRepository;
     private final LessonSlotRepository lessonSlotRepository;
@@ -28,8 +28,7 @@ public class ReflowService {
     }
 
     private Layout layout(Subject subject) {
-        List<String> groups = subject.getClasses().stream().map(SchoolClass::getClassName).toList();
-        List<Lesson> timetable = lessonRepository.findBySubjectAndGroups(subject.getName(), groups);
+        List<TimetableEntry> timetable = timetableEntryRepository.findBySubjectIdOrderByStartTime(subject.getId());
         if (timetable.isEmpty()) {
             return null;
         }
@@ -41,10 +40,10 @@ public class ReflowService {
                 continue;
             }
             LocalDate date = day.getCalendarDate();
-            for (Lesson l : timetable) {
-                boolean active = l.getDayOfWeek().equals(day.getDayOfWeek())
-                        && !l.getValidFrom().isAfter(date)
-                        && (l.getValidTo() == null || !l.getValidTo().isBefore(date));
+            for (TimetableEntry entry : timetable) {
+                boolean active = entry.getDayOfWeek().equals(day.getDayOfWeek())
+                        && !entry.getValidFrom().isAfter(date)
+                        && (entry.getValidTo() == null || !entry.getValidTo().isBefore(date));
                 if (active) {
                     available.add(date);
                 }

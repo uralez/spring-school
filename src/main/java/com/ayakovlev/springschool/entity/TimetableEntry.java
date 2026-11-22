@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "lessons")
+@Table(name = "timetable")
 @Getter
 @Setter
-public class Lesson {
+public class TimetableEntry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,7 +35,7 @@ public class Lesson {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-    public String getMainGroup() {
-        return groups.stream().sorted().findFirst().orElse("");
-    }
+//    public String getMainGroup() {
+//        return groups.stream().sorted().findFirst().orElse("");
+//    }
 }

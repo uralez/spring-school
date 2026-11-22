@@ -40,10 +40,10 @@ public class SubjectController {
         return "subject";
     }
 
-    @GetMapping("/subject/{name}/{className}")
-    public String legacy(@PathVariable String name, @PathVariable String className) {
-        return subjectService.find(name, className, LocalDate.now())
-                .map(s -> "redirect:/subject/" + s.getId())
-                .orElse("redirect:/");
-    }
+//    @GetMapping("/subject/{name}/{className}")
+//    public String legacy(@PathVariable String name, @PathVariable String className) {
+//        return subjectService.find(name, className, LocalDate.now())
+//                .map(s -> "redirect:/subject/" + s.getId())
+//                .orElse("redirect:/");
+//    }
 }

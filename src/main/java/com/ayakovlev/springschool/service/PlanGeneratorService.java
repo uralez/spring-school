@@ -18,7 +18,7 @@ public class PlanGeneratorService {
 
     private static final int FINAL_REVIEWS = 2;
 
-    private final LessonRepository lessonRepository;
+    private final TimetableEntryRepository timetableEntryRepository;
     private final CalendarDayRepository calendarDayRepository;
     private final AcademicModuleRepository academicModuleRepository;
     private final SubjectRepository subjectRepository;
@@ -30,7 +30,7 @@ public class PlanGeneratorService {
     }
 
     @Transactional
-    public Subject create(Lesson source, int year, String language, LocalDate today, String username) {
+    public Subject create(TimetableEntry source, int year, String language, LocalDate today, String username) {
         String name = source.getSubjectName();
         List<String> groups = source.getGroups().stream().sorted().toList();
         Optional<Subject> existing = subjectRepository.findByNameYearAndClass(name, year, groups.get(0));
@@ -43,7 +43,7 @@ public class PlanGeneratorService {
 //            return existing.get();
 //        }
 
-        List<Lesson> timetable = lessonRepository.findBySubjectIdOrderByStartTime(source.getSubject().getId());
+        List<TimetableEntry> timetable = timetableEntryRepository.findBySubjectIdOrderByStartTime(source.getSubject().getId());
 //        List<Lesson> timetable = lessonRepository.findBySubjectAndGroups(name, groups);
         List<AcademicModule> modules = academicModuleRepository.findAll(Sort.by("moduleNumber"));
         int lastModule = modules.get(modules.size() - 1).getModuleNumber();
@@ -51,16 +51,16 @@ public class PlanGeneratorService {
         List<Slot> slots = new ArrayList<>();
         for (CalendarDay day : calendarDayRepository.findByDayTypeOrderByCalendarDate("working")) {
             LocalDate date = day.getCalendarDate();
-            for (Lesson l : timetable) {
-                boolean active = l.getDayOfWeek().equals(day.getDayOfWeek())
-                        && !l.getValidFrom().isAfter(date)
-                        && (l.getValidTo() == null || !l.getValidTo().isBefore(date));
+            for (TimetableEntry entry : timetable) {
+                boolean active = entry.getDayOfWeek().equals(day.getDayOfWeek())
+                        && !entry.getValidFrom().isAfter(date)
+                        && (entry.getValidTo() == null || !entry.getValidTo().isBefore(date));
                 if (!active) {
                     continue;
                 }
                 for (AcademicModule m : modules) {
                     if (!date.isBefore(m.getStartDate()) && !date.isAfter(m.getEndDate())) {
-                        slots.add(new Slot(date, l.getStartTime(), m.getModuleNumber()));
+                        slots.add(new Slot(date, entry.getStartTime(), m.getModuleNumber()));
                     }
                 }
             }

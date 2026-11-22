@@ -28,11 +28,11 @@ public class SubjectService {
     private final TopicListParser topicListParser;
     private final CalendarDayRepository calendarDayRepository;
 
-    @Transactional(readOnly = true)
-    public Optional<Subject> find(String name, String className, LocalDate today) {
-        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
-        return subjectRepository.findByNameYearAndClass(name, year, className);
-    }
+//    @Transactional(readOnly = true)
+//    public Optional<Subject> find(String name, String className, LocalDate today) {
+//        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
+//        return subjectRepository.findByNameYearAndClass(name, year, className);
+//    }
 
     @Transactional(readOnly = true)
     public List<CourseLesson> lessons(Long subjectId) {
