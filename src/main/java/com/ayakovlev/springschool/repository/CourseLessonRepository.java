@@ -19,8 +19,9 @@ public interface CourseLessonRepository extends JpaRepository<CourseLesson, Long
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(value = """
         UPDATE course_lesson c SET lesson_number = r.n + 100000
-        FROM (SELECT id, row_number() OVER (ORDER BY planned_date NULLS LAST, lesson_number, id) AS n
-              FROM course_lesson WHERE subject_id = :subjectId) r
+        FROM (SELECT cl.id, row_number() OVER (ORDER BY s.slot_date NULLS LAST, cl.lesson_number, cl.id) AS n
+              FROM course_lesson cl LEFT JOIN lesson_slot s ON s.id = cl.slot_id
+              WHERE cl.subject_id = :subjectId) r
         WHERE c.id = r.id
         """, nativeQuery = true)
     void renumberStep1(@Param("subjectId") Long subjectId);

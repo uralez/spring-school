@@ -25,7 +25,7 @@ public class CourseLesson extends BaseEntity {
     private Integer lessonNumber;
     private String lessonType;
     private String topic;
-    private LocalDate plannedDate;
+//    private LocalDate plannedDate;
     private LocalDate actualDate;
     private String comment;
     private String lecture;
@@ -39,6 +39,6 @@ public class CourseLesson extends BaseEntity {
     private LessonSlot slot;
 
     public LocalDate getPlannedDate() {
-        return slot != null ? slot.getSlotDate() : plannedDate;
+        return slot != null ? slot.getSlotDate() : null;
     }
 }

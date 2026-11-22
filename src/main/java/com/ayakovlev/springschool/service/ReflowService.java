@@ -108,7 +108,7 @@ public class ReflowService {
 
         for (CourseLesson l : layout.movable()) {
             l.setSlot(null);
-            l.setPlannedDate(null);
+//            l.setPlannedDate(null);
         }
         courseLessonRepository.flush();
 
@@ -147,7 +147,7 @@ public class ReflowService {
             if (i < free.size()) {
                 LessonSlot s = slots.get(free.get(i++));
                 l.setSlot(s);
-                l.setPlannedDate(s.getSlotDate());
+//                l.setPlannedDate(s.getSlotDate());
             }
         }
         List<CourseLesson> created = new ArrayList<>();
@@ -158,7 +158,7 @@ public class ReflowService {
             l.setSubject(subject);
             l.setLessonType("lesson");
             l.setSlot(s);
-            l.setPlannedDate(s.getSlotDate());
+//            l.setPlannedDate(s.getSlotDate());
             l.setLessonNumber(++temp);
             created.add(l);
         }

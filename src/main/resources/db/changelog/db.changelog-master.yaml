@@ -39,3 +39,5 @@
       file: db/changelog/changes/019_link_lessons_to_slots.sql
   - include:
       file: db/changelog/changes/020_slot_times.sql
+  - include:
+      file: db/changelog/changes/021_drop_planned_date.sql

@@ -117,7 +117,7 @@ public class PlanGeneratorService {
                 default -> null;
             });
             lesson.setSlot(slot);
-            lesson.setPlannedDate(s.date());
+//            lesson.setPlannedDate(s.date());
             if (!s.date().isAfter(today)) {
                 lesson.setActualDate(s.date());
             }
