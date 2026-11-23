@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="#{textbooks.title}">Textbooks</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/img/leaf.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+<div class="container">
+    <h1 th:text="#{textbooks.title}">Textbooks</h1>
+    <p th:if="${groups.isEmpty()}" th:text="#{textbooks.none}">No textbooks</p>
+    <section th:each="g : ${groups}">
+        <h2 th:text="#{textbooks.class(${g.className()})}">Class</h2>
+
+
+        <div class="textbook-card" th:each="e : ${g.entries()}">
+            <img th:if="${e.textbook().previewFile != null}" class="textbook-preview"
+                 th:src="@{/textbooks/{id}/preview(id=${e.textbook().id})}" alt="">
+            <dl class="textbook" th:with="t=${e.textbook()}">
+                <dt th:text="#{textbook.title}">Title</dt>
+                <dd th:text="${t.title}"></dd>
+                <dt th:text="#{textbook.authors}">Authors</dt>
+                <dd th:text="${t.authors}"></dd>
+                <dt th:text="#{textbook.publisher}">Publisher</dt>
+                <dd th:text="${t.publisher}"></dd>
+                <dt th:text="#{textbook.year}">Year</dt>
+                <dd th:text="${t.publicationYear}"></dd>
+                <dt th:text="#{textbook.isbn}">ISBN</dt>
+                <dd th:text="${t.isbn}"></dd>
+
+                <dt th:text="#{textbook.years}">Designed for (years)</dt>
+                <dd>
+                    <span th:if="${t.yearsDesigned != null}" th:text="${t.yearsDesigned}"></span>
+                    <a th:if="${t.yearsDesigned == null}" class="missing-link"
+                       th:href="@{/subject/{id}(id=${e.firstSubjectId()})}" th:text="#{textbooks.years.missing}"></a>
+                </dd>
+
+                <dt th:if="${t.publisherUrl != null}" th:text="#{textbook.site}">Website</dt>
+                <dd th:if="${t.publisherUrl != null}">
+                    <a th:href="${t.publisherUrl}" th:text="${t.publisherUrl}"></a>
+                </dd>
+
+                <dt th:if="${staff and e.textbook().storedFile != null}" th:text="#{textbook.file.download}">File</dt>
+                <dd th:if="${staff and e.textbook().storedFile != null}">
+                    <a th:href="@{/textbooks/{id}/file(id=${e.textbook().id})}" th:text="${e.textbook().originalName}"></a>
+                </dd>
+
+                <dt th:text="#{textbooks.used}">Used this year</dt>
+                <dd>
+                    <div th:each="u : ${e.usage()}">
+                        <span th:text="${u.label()}"></span>
+                        <a th:if="${!u.coverageSet()}" class="missing-link"
+                           th:href="@{/subject/{id}(id=${u.subjectId()})}" th:text="'· ' + #{textbooks.coverage.missing}"></a>
+                        <span th:if="${u.approvedBy() != null}" class="approved"
+                              th:text="'· ' + #{textbooks.approved(${u.approvedBy()}, ${#temporals.format(u.approvedOn(), 'dd.MM.yyyy')})}"></span>
+                        <a th:if="${u.approvedBy() == null}" class="missing-link"
+                           th:href="@{/subject/{id}(id=${u.subjectId()})}" th:text="'· ' + #{textbooks.approved.missing}"></a>
+                    </div>
+                </dd>
+
+            </dl>
+        </div>
+
+    </section>
+</div>
+</body>
+</html>

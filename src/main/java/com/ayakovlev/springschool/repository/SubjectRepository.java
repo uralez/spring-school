@@ -19,4 +19,6 @@ public interface SubjectRepository extends JpaRepository<Subject, Long> {
                                              @Param("className") String className);
 
     List<Subject> findByAcademicYear(Integer academicYear);
+
+    List<Subject> findByAcademicYearOrderByName(Integer academicYear);
 }

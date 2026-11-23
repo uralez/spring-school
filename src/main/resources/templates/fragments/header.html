@@ -13,6 +13,7 @@
         <nav class="main-nav">
             <a th:href="@{/}" th:text="#{menu.timetable}">Timetable</a>
             <a th:href="@{/calendar}" th:text="#{menu.calendar}">Calendar</a>
+            <a th:href="@{/textbooks}" th:text="#{menu.textbooks}">Textbooks</a>
             <a th:if="${menuAdmin}" th:href="@{/admin/grades}" th:text="#{menu.grades}">Grade book</a>
             <a th:if="${menuAdmin}" th:href="@{/admin/students}" th:text="#{menu.students}">Students</a>
         </nav>

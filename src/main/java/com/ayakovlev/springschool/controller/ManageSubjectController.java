@@ -3,6 +3,7 @@ package com.ayakovlev.springschool.controller;
 import com.ayakovlev.springschool.entity.Subject;
 import com.ayakovlev.springschool.service.ReflowService;
 import com.ayakovlev.springschool.service.SubjectService;
+import com.ayakovlev.springschool.service.TextbookFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
@@ -25,6 +27,7 @@ public class ManageSubjectController {
     private final SubjectService subjectService;
     private final ReflowService reflowService;
     private final MessageSource messageSource;
+    private final TextbookFileService textbookFileService;
 
     @PostMapping("/{id}/textbook")
     @PreAuthorize("@access.canEditSubject(authentication, #id)")
@@ -35,8 +38,9 @@ public class ManageSubjectController {
                                @RequestParam(required = false) Integer publicationYear,
                                @RequestParam(required = false) String isbn,
                                @RequestParam(required = false) String publisherUrl,
-                               @RequestParam(required = false) String fileUrl) {
-        subjectService.saveTextbook(id, title, authors, publisher, publicationYear, isbn, publisherUrl, fileUrl);
+                               @RequestParam(required = false) String fileUrl,
+                               @RequestParam(required = false) Integer yearsDesigned) {
+        subjectService.saveTextbook(id, title, authors, publisher, publicationYear, isbn, publisherUrl, fileUrl, yearsDesigned);
         Subject subject = subjectService.subject(id);
         return "redirect:/subject/" + subject.getId();
 //        return "redirect:/subject/" + subject.getName() + "/" + subject.getClasses().get(0).getClassName();
@@ -109,5 +113,27 @@ public class ManageSubjectController {
     public String clearLesson(@PathVariable Long id, @PathVariable Long lessonId) {
         subjectService.clearLesson(lessonId);
         return "redirect:/lesson/" + lessonId;
+    }
+
+    @PostMapping("/{id}/coverage")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String saveCoverage(@PathVariable Long id,
+                               @RequestParam(required = false) String coverage,
+                               @RequestParam(required = false) String coverageNote) {
+        subjectService.saveCoverage(id, coverage, coverageNote);
+        return "redirect:/subject/" + id;
+    }
+
+    @PostMapping("/{id}/textbook-file")
+    @PreAuthorize("@access.canEditSubject(authentication, #id)")
+    public String uploadTextbook(@PathVariable Long id, @RequestParam("file") MultipartFile file)
+            throws java.io.IOException {
+        Subject subject = subjectService.subject(id);
+        if (subject.getTextbook() == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        textbookFileService.store(subject.getTextbook().getId(), file);
+        return "redirect:/subject/" + id;
     }
 }

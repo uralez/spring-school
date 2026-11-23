@@ -1,6 +1,8 @@
 package com.ayakovlev.springschool.service;
 
 import com.ayakovlev.springschool.dto.PlanItem;
+import com.ayakovlev.springschool.dto.TextbookEntry;
+import com.ayakovlev.springschool.dto.TextbookGroup;
 import com.ayakovlev.springschool.entity.*;
 import com.ayakovlev.springschool.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -142,7 +144,8 @@ public class SubjectService {
 
     @Transactional
     public void saveTextbook(Long subjectId, String title, String authors, String publisher,
-                             Integer year, String isbn, String publisherUrl, String fileUrl) {
+                             Integer year, String isbn, String publisherUrl, String fileUrl,
+                             Integer yearsDesigned) {
         Subject subject = subjectRepository.findById(subjectId).orElseThrow();
         Textbook textbook = subject.getTextbook() != null ? subject.getTextbook() : new Textbook();
         textbook.setTitle(title.trim());
@@ -152,6 +155,7 @@ public class SubjectService {
         textbook.setIsbn(blank(isbn));
         textbook.setPublisherUrl(blank(publisherUrl));
         textbook.setFileUrl(blank(fileUrl));
+        textbook.setYearsDesigned(yearsDesigned);
         textbookRepository.save(textbook);
         subject.setTextbook(textbook);
     }
@@ -323,5 +327,48 @@ public class SubjectService {
             }
         }
         return result;
+    }
+
+    @Transactional(readOnly = true)
+    public List<TextbookGroup> textbooksByClass(LocalDate today) {
+        int year = today.getMonthValue() >= 9 ? today.getYear() : today.getYear() - 1;
+        Map<String, Map<Textbook, List<TextbookEntry.Usage>>> byClass = new TreeMap<>();
+        Map<Textbook, Long> firstSubject = new HashMap<>();
+        for (Subject s : subjectRepository.findByAcademicYearOrderByName(year)) {
+            if (s.getTextbook() == null || s.getClasses().isEmpty()) {
+                continue;
+            }
+            String key = s.getClasses().stream()
+                    .map(SchoolClass::getGrade).distinct().sorted()
+                    .map(String::valueOf).collect(Collectors.joining("/"));
+            String groups = s.getClasses().stream().map(SchoolClass::getClassName).sorted()
+                    .collect(Collectors.joining(", "));
+            String label = s.getName() + " " + groups;
+            if (s.getCoverage() != null) {
+                label += ": " + s.getCoverage().replace('_', ' ');
+                if (s.getCoverageNote() != null) {
+                    label += " (" + s.getCoverageNote() + ")";
+                }
+            }
+            firstSubject.putIfAbsent(s.getTextbook(), s.getId());
+            byClass.computeIfAbsent(key, k -> new LinkedHashMap<>())
+                    .computeIfAbsent(s.getTextbook(), t -> new ArrayList<>())
+                    .add(new TextbookEntry.Usage(s.getId(), label, s.getCoverage() != null,
+                            s.getApprovedBy(), s.getApprovedOn()));
+        }
+        List<TextbookGroup> result = new ArrayList<>();
+        byClass.forEach((k, v) -> {
+            List<TextbookEntry> entries = new ArrayList<>();
+            v.forEach((t, usage) -> entries.add(new TextbookEntry(t, firstSubject.get(t), usage)));
+            result.add(new TextbookGroup(k, entries));
+        });
+        return result;
+    }
+
+    @Transactional
+    public void saveCoverage(Long subjectId, String coverage, String note) {
+        Subject subject = subjectRepository.findById(subjectId).orElseThrow();
+        subject.setCoverage(coverage == null || coverage.isBlank() ? null : coverage);
+        subject.setCoverageNote(note == null || note.isBlank() ? null : note.trim());
     }
 }

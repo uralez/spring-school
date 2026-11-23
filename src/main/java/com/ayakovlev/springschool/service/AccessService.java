@@ -61,4 +61,20 @@ public class AccessService {
                 .map(l -> canEditSubject(authentication, l.getSubject().getId()))
                 .orElse(false);
     }
+
+    @Transactional(readOnly = true)
+    public boolean canReadTextbook(Authentication authentication, Long textbookId) {
+        if (authentication == null) {
+            return false;
+        }
+        for (String role : new String[]{"ADMIN", "DIRECTOR", "DEPUTY", "METHODIST"}) {
+            if (hasRole(authentication, role)) {
+                return true;
+            }
+        }
+        return hasRole(authentication, "TEACHER") && subjectRepository.findAll().stream()
+                .anyMatch(s -> s.getTextbook() != null && s.getTextbook().getId().equals(textbookId)
+                        && s.getTeachers().stream().anyMatch(
+                        t -> t.getUser().getUsername().equals(authentication.getName())));
+    }
 }

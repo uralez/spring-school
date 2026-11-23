@@ -56,8 +56,51 @@
             <label for="tb-file" th:text="#{textbook.file}">File link</label>
             <input id="tb-file" name="fileUrl" th:value="${subject.textbook?.fileUrl}"
                    th:classappend="${#strings.isEmpty(subject.textbook?.fileUrl)} ? 'missing'">
+            <label for="tb-years" th:text="#{textbook.years}">Designed for (years)</label>
+            <select id="tb-years" name="yearsDesigned" class="fancy-select">
+                <option value=""></option>
+                <option value="1" th:selected="${subject.textbook?.yearsDesigned == 1}">1</option>
+                <option value="2" th:selected="${subject.textbook?.yearsDesigned == 2}">2</option>
+                <option value="3" th:selected="${subject.textbook?.yearsDesigned == 3}">3</option>
+            </select>
             <button type="submit" class="btn-save" th:text="#{textbook.save}">Save textbook</button>
         </form>
+
+        <div th:if="${canEdit}" class="textbook-file">
+            <p th:if="${subject.textbook == null}" th:text="#{textbook.upload.first}"></p>
+            <th:block th:if="${subject.textbook != null}">
+                <p th:if="${subject.textbook.storedFile != null}">
+                    <span th:text="#{textbook.file.current(${subject.textbook.originalName})}"></span>
+                    <a th:href="@{/textbooks/{id}/file(id=${subject.textbook.id})}" th:text="#{textbook.file.download}">Download</a>
+                </p>
+                <form method="post" enctype="multipart/form-data"
+                      th:action="@{/manage/subject/{id}/textbook-file(id=${subject.id})}" class="textbook-form">
+                    <label for="tb-upload" th:text="#{textbook.upload}">Upload</label>
+                    <input id="tb-upload" type="file" name="file" accept="application/pdf,.pdf" required>
+                    <button type="submit" class="btn-save" th:text="#{textbook.save}">Save</button>
+                </form>
+            </th:block>
+        </div>
+
+        <form th:if="${canEdit}" th:action="@{/manage/subject/{id}/coverage(id=${subject.id})}"
+              method="post" class="textbook-form">
+            <label for="cv-kind" th:text="#{coverage.label}">Covered this year</label>
+            <select id="cv-kind" name="coverage" class="fancy-select">
+                <option value=""></option>
+                <option value="whole" th:selected="${subject.coverage == 'whole'}" th:text="#{coverage.whole}"></option>
+                <option value="first_half" th:selected="${subject.coverage == 'first_half'}" th:text="#{coverage.first_half}"></option>
+                <option value="second_half" th:selected="${subject.coverage == 'second_half'}" th:text="#{coverage.second_half}"></option>
+                <option value="two_thirds" th:selected="${subject.coverage == 'two_thirds'}" th:text="#{coverage.two_thirds}"></option>
+                <option value="other" th:selected="${subject.coverage == 'other'}" th:text="#{coverage.other}"></option>
+            </select>
+            <label for="cv-note" th:text="#{coverage.note}">Note</label>
+            <input id="cv-note" name="coverageNote" th:value="${subject.coverageNote}">
+            <button type="submit" class="btn-save" th:text="#{textbook.save}">Save</button>
+        </form>
+
+        <p th:if="${!canEdit and subject.coverage != null}"
+           th:text="#{coverage.label} + ': ' + #{${'coverage.' + subject.coverage}}"></p>
+
         <dl class="textbook" th:if="${!canEdit and subject.textbook != null}">
             <dt th:text="#{textbook.title}">Title</dt>
             <dd th:text="${subject.textbook.title}"></dd>

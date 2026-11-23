@@ -222,3 +222,21 @@ style.css: .reflow-form { margin: 0 0 16px; }
 .grade-actions button { border: 1px solid var(--green); background: #fff; color: var(--green-dark); border-radius: 6px; width: 28px; height: 28px; cursor: pointer; }
 
 .plan tr.off-day td { background: #ffd6d6; }
+
+/*
+.textbook-card { margin: 0 0 12px; }
+*/
+
+.missing-link { color: #b3261e; font-weight: 700; }
+.approved { color: var(--green-dark); }
+
+.textbook-card { margin: 0 0 16px; }
+.textbook dd { margin: 0; overflow-wrap: anywhere; }
+.textbook dt { align-self: start; }
+section h2 { margin-top: 28px; }
+
+.textbook-file { margin: 0 0 20px; }
+
+.textbook-card { display: flex; gap: 16px; align-items: flex-start; }
+.textbook-preview { width: 140px; border: 1px solid #ccc; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+

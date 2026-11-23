@@ -35,4 +35,7 @@ public class Subject extends BaseEntity {
             joinColumns = @JoinColumn(name = "subject_id"),
             inverseJoinColumns = @JoinColumn(name = "teacher_id"))
     private Set<Teacher> teachers = new HashSet<>();
+
+    private String coverage;
+    private String coverageNote;
 }

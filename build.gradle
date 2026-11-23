@@ -26,6 +26,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.commonmark:commonmark:0.30.0'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.apache.pdfbox:pdfbox:3.0.7'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

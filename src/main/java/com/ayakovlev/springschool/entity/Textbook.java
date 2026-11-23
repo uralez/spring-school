@@ -18,4 +18,8 @@ public class Textbook extends BaseEntity {
     private String isbn;
     private String publisherUrl;
     private String fileUrl;
+    private Integer yearsDesigned;
+    private String storedFile;
+    private String originalName;
+    private String previewFile;
 }

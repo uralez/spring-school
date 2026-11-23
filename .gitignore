@@ -41,3 +41,5 @@ application-local.properties
 
 .env
 *.tar
+
+data/

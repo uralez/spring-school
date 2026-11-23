@@ -45,4 +45,7 @@
       file: db/changelog/changes/022_rename_lessons_to_timetable.sql
   - include:
       file: db/changelog/changes/023_rename_course_lesson_to_lesson.sql
-
+  - include:
+      file: db/changelog/changes/024_textbook_fields.sql
+  - include:
+      file: db/changelog/changes/025_textbook_file.sql
